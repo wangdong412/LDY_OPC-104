@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw104_Trans", "hw_104Trans.vcproj", "{0435176E-EFC2-442F-B2CD-7D85E214227E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD} = {60776E27-49C8-47B5-A6DF-7139ACBD2CCD}
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA} = {514F1AEA-7018-48F2-86CB-BE08831EBBDA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw104_Common", "..\hw_Common\hw_Common.vcproj", "{514F1AEA-7018-48F2-86CB-BE08831EBBDA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw104_PKSCollector", "..\hw104_PKSCollector\hw104_PKSCollector.vcproj", "{60776E27-49C8-47B5-A6DF-7139ACBD2CCD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA} = {514F1AEA-7018-48F2-86CB-BE08831EBBDA}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tst", "tst", "{F32427AF-4811-4D5B-9053-C6FE27481BE1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pksTest", "..\pksTest\pksTest.vcproj", "{0C0A88CA-4B8A-42FC-A330-06B05C4102BC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD} = {60776E27-49C8-47B5-A6DF-7139ACBD2CCD}
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA} = {514F1AEA-7018-48F2-86CB-BE08831EBBDA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0435176E-EFC2-442F-B2CD-7D85E214227E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0435176E-EFC2-442F-B2CD-7D85E214227E}.Debug|Win32.Build.0 = Debug|Win32
+		{0435176E-EFC2-442F-B2CD-7D85E214227E}.Release|Win32.ActiveCfg = Release|Win32
+		{0435176E-EFC2-442F-B2CD-7D85E214227E}.Release|Win32.Build.0 = Release|Win32
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA}.Debug|Win32.Build.0 = Debug|Win32
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA}.Release|Win32.ActiveCfg = Release|Win32
+		{514F1AEA-7018-48F2-86CB-BE08831EBBDA}.Release|Win32.Build.0 = Release|Win32
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD}.Debug|Win32.Build.0 = Debug|Win32
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD}.Release|Win32.ActiveCfg = Release|Win32
+		{60776E27-49C8-47B5-A6DF-7139ACBD2CCD}.Release|Win32.Build.0 = Release|Win32
+		{0C0A88CA-4B8A-42FC-A330-06B05C4102BC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0C0A88CA-4B8A-42FC-A330-06B05C4102BC}.Debug|Win32.Build.0 = Debug|Win32
+		{0C0A88CA-4B8A-42FC-A330-06B05C4102BC}.Release|Win32.ActiveCfg = Release|Win32
+		{0C0A88CA-4B8A-42FC-A330-06B05C4102BC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0C0A88CA-4B8A-42FC-A330-06B05C4102BC} = {F32427AF-4811-4D5B-9053-C6FE27481BE1}
+	EndGlobalSection
+EndGlobal

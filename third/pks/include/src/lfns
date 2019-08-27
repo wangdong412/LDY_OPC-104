@@ -1,0 +1,332 @@
+
+/*     ******* SCADA LFN NUMBERS ****** */
+
+/*     SCCS REVISION: */
+/*	  @(#)lfns,v	830.1 */
+
+/*     DESCRIPTION: */
+/*         Files are shared between groups and tasks. Hence a set of global */
+/*         lfn's have been assigned. The one exception is the print group */
+/*         which only accesses DATA, EVENTS, DELAYS,SOES, and printers. */
+/*         The printer lfn's are not unique. */
+
+/*       integer*2  RUNLFN , BUPLFN , TAGLFN , EVTLFN , DLYLFN */
+/*       integer*2  SOELFN , BKRLFN , DFDLFN , SHALFN , RPTLFN */
+/*       integer*2  HXRLFN , HRLLFN , HWILFN , HCILFN */
+/*       integer*2  DDTLFN , PADLFN , SPADLFN, SDDTLFN */
+/*       integer*2  DSPTLFN, SHATLFN, OIDLFN */
+/*       integer*2  H00LFN , H01LFN , H02LFN , H03LFN , H04LFN */
+/*       integer*2  H05LFN , H06LFN , H07LFN , H08LFN , H09LFN */
+/*       integer*2  H10LFN , H11LFN , H12LFN , H13LFN , H14LFN , H15LFN */
+
+/*       integer*2  AMPLFN */
+/*       integer*2  ATPDLFN, AZONLFN, ALVLLFN, ARPTLFN, AAGRLFN */
+/*       integer*2  ACRDLFN, ADVALFN, ASYSLFN, AIMGLFN */
+/*       integer*2  AGRPLFN, ACDMLFN, ACODLFN, AKEYLFN */
+/*       integer*2  ARMPLFN */
+/*       integer*2  CAMCLFN, PSTSLFN, SHFTLFN, LGHTLFN, AFGPLFN */
+/*       integer*2  RCPLFN , SPPRECLFN, UMAXSPLFN */
+/*       integer*2  DMTLFN , TOURLFN, IVRLFN , MASCLFN */
+/*       integer*2  GTSSLFN, GTSGLFN, GTSCLFN, GTSNLFN */
+/*       integer*2  XL10ZMLFN, XL10XLLFN, XL10SLLFN */
+/*       integer*2  SECHIPLFN, ACSACTLFN, EVTSEQLFN */
+/*       integer*2  GRPCTRLLFN, U800SPLFN, U800ADLFN */
+
+/*       integer*2  U01LFN , U02LFN , U03LFN , U04LFN , U05LFN */
+/*       integer*2  U06LFN , U07LFN , U08LFN , U09LFN , U10LFN */
+/*       integer*2  U11LFN , U12LFN , U13LFN , U14LFN , U15LFN */
+/*       integer*2  U16LFN , U17LFN , U18LFN , U19LFN , U20LFN */
+/*       integer*2  U21LFN , U22LFN , U23LFN , U24LFN , U25LFN */
+/*       integer*2  U26LFN , U27LFN , U28LFN , U29LFN , U30LFN */
+/*       integer*2  U31LFN , U32LFN , U33LFN , U34LFN , U35LFN */
+/*       integer*2  U36LFN , U37LFN , U38LFN , U39LFN , U40LFN */
+/*       integer*2  U41LFN , U42LFN , U43LFN , U44LFN , U45LFN */
+/*       integer*2  U46LFN , U47LFN , U48LFN , U49LFN , U50LFN */
+/*       integer*2  U51LFN , U52LFN , U53LFN , U54LFN , U55LFN */
+/*       integer*2  U56LFN , U57LFN , U58LFN , U59LFN , U60LFN */
+/*       integer*2  U61LFN , U62LFN , U63LFN , U64LFN , U65LFN */
+/*       integer*2  U66LFN , U67LFN , U68LFN , U69LFN , U70LFN */
+/*       integer*2  U71LFN , U72LFN , U73LFN , U74LFN , U75LFN */
+/*       integer*2  U76LFN , U77LFN , U78LFN , U79LFN , U80LFN */
+/*       integer*2  U81LFN , U82LFN , U83LFN , U84LFN , U85LFN */
+/*       integer*2  U86LFN , U87LFN , U88LFN , U89LFN , U90LFN */
+/*       integer*2  U91LFN , U92LFN , U93LFN , U94LFN , U95LFN */
+/*       integer*2  U96LFN , U97LFN , U98LFN , U99LFN , U100LFN */
+/*       integer*2  U101LFN, U102LFN, U103LFN, U104LFN, U105LFN */
+/*       integer*2  U106LFN, U107LFN, U108LFN, U109LFN, U110LFN */
+/*       integer*2  U111LFN, U112LFN, U113LFN, U114LFN, U115LFN */
+/*       integer*2  U116LFN, U117LFN, U118LFN, U119LFN, U120LFN */
+/*       integer*2  U121LFN, U122LFN, U123LFN, U124LFN, U125LFN */
+/*       integer*2  U126LFN, U127LFN, U128LFN, U129LFN, U130LFN */
+/*       integer*2  U131LFN, U132LFN, U133LFN, U134LFN, U135LFN */
+/*       integer*2  U136LFN, U137LFN, U138LFN, U139LFN, U140LFN */
+/*       integer*2  U141LFN, U142LFN, U143LFN, U144LFN, U145LFN */
+/*       integer*2  U146LFN, U147LFN, U148LFN, U149LFN, U150LFN */
+
+/*                                file pathname stored in LFNTBL (24 char) */
+/*                                123456789012345678901234 */
+#define	RUNLFN	7	 /*  <DATA>DATA               - main data file */
+#define	BUPLFN	8	 /*  <DATA>DATA               - backup data file */
+#define	TAGLFN	9	 /*  <DATA>TAGFL              - tag file */
+#define	EVTLFN	10	 /*  <DATA>EVENTS             - event file */
+#define	DLYLFN	11	 /*  <DATA>DELAYS             - delay file */
+#define	SOELFN	12	 /*  <DATA>SOES               - SOE file */
+#define	BKRLFN	13	 /*  <DATA>CRTBKR             - display backgrounds */
+#define	DFDLFN	14	 /*  <DATA>CRTDFD             - display DFD's */
+#define	SHALFN	15	 /*  <DATA>CRTSHA             - shapes */
+#define	RPTLFN	16	 /*                           - report lfn */
+/*     parameter (       = 17) ;* */
+#define	HXRLFN	18	 /*  <DATA>HXR000             - hardware xreference */
+#define	HRLLFN	19	 /*  <DATA>HRL000             - hardware ref. list */
+#define	HWILFN	20	 /*  <DATA>HWI000             - hardware image */
+#define	HCILFN	21	 /*  <DATA>HCI000             - hard. config. image */
+#define	DDTLFN	22	 /*  <DATA>LCNDDT             - LCN ddt file */
+#define	PADLFN	23	 /*  <DATA>LCNPAD             - LCN PAD file */
+#define	SPADLFN	24	 /*  <DATA>SCNPAD             - pad file */
+#define	SDDTLFN	25	 /*  <DATA>SCNDDT             - ddt file */
+#define	DSPTLFN	26	 /*  <DATA>DSPTBL             - display titles */
+#define	SHATLFN	27	 /*  <DATA>SHATBL             - shape titles */
+#define	OIDLFN	28	 /*  <DATA>OPERID             - operator profiles */
+/*     parameter (       = 29) ;* */
+/*     parameter (       = 30) ;* */
+/*     parameter (       = 31) ;* */
+/*     parameter (       = 32) ;* */
+/*     parameter (       = 33) ;* */
+/*     parameter (       = 34) ;* */
+#define	H00LFN	35	 /*  <DATA>HISTORY0           - history 0 */
+#define	H01LFN	36	 /*  <DATA>HISTORY1           - history 1 */
+#define	H02LFN	37	 /*  <DATA>HISTORY2           - history 2 */
+#define	H03LFN	38	 /*  <DATA>HISTORY3           - history 3 */
+#define	H04LFN	39	 /*  <DATA>HISTORY4           - history 4 */
+#define	H05LFN	40	 /*  <DATA>HISTORY5           - history 5 */
+#define	H06LFN	41	 /*  <DATA>HISTORY6           - history 6 */
+#define	H07LFN	42	 /*  <DATA>HISTORY7           - history 7 */
+#define	H08LFN	43	 /*  <DATA>HISTORY8           - history 8 */
+#define	H09LFN	44	 /*  <DATA>HISTORY9           - history 9 */
+#define	H10LFN	45	 /*  <DATA>HISTORY10          - history 10 */
+#define	H11LFN	46	 /*  <DATA>HISTORY11          - history 11 */
+#define	H12LFN	47	 /*  <DATA>HISTORY12          - history 12 */
+#define	H13LFN	48	 /*  <DATA>HISTORY13          - history 13 */
+#define	H14LFN	49	 /*  <DATA>HISTORY14          - history 14 */
+#define	H15LFN	50	 /*  <DATA>HISTORY15          - history 15 */
+
+/* leave a gap here for dynamic LFN allocation as FORTRAN can only */
+/* use unit numbers up to 99. */
+
+#define	AMPLFN	100	 /*  <DATA>AMPTBL             - Asset Management Permissions */
+/*     parameter (       =101) ;* */
+#define	ATPDLFN	102	 /*  <DATA>ACSTPD             - Access Time Periods */
+#define	AZONLFN	103	 /*  <DATA>ACSZON             - Access Zones */
+#define	ALVLLFN	104	 /*  <DATA>ACSLVL             - Access Levels */
+#define	ARPTLFN	105	 /*  <DATA>ACSRPT             - Access SE Rpt Modes */
+#define	AAGRLFN	106	 /*  <DATA>ACSAGR             - Access Alarm Groups */
+#define	ACRDLFN	107	 /*  <DATA>ACSCRD             - Access Cards */
+#define	ADVALFN	108	 /*  <DATA>ACSDVA             - Access Dev. Assign. */
+#define	ASYSLFN	109	 /*  <DATA>ACSSYS             - Access SE System */
+#define	AIMGLFN	110	 /*  <DATA>ACSIMG             - Access SE Image */
+#define	AGRPLFN	111	 /*  <DATA>ACSGRP             - Access Groups */
+#define	ACDMLFN	112	 /*  <DATA>ACSCDM             - Access Codes Map */
+#define	ACODLFN	113	 /*  <DATA>ACSCOD             - Access Codes */
+#define	AKEYLFN	114	 /*  <DATA>ACSKEY             - Access Keys */
+/*     parameter (       =115) ;* */
+/*     parameter (       =117) ;* */
+#define	ARMPLFN	119	 /*  <DATA>GDAMAP             - opc area mappings */
+#define	CAMCLFN	120	 /*  <DATA>CAMCFG             - cam/mon assignments */
+#define	PSTSLFN	121	 /*  <DATA>PNTSTS             - Point sts summary */
+#define	SHFTLFN	122	 /*  <DATA>SHFMGR             - Shift manager */
+#define	LGHTLFN	123	 /*  <DATA>LIGHTS             - Lighting Control */
+#define	AFGPLFN	124	 /*  <DATA>ACSFGP             - uELV Floor Goups */
+#define	RCPLFN	125	 /*  <DATA>RECIPES            - recipe table */
+#define	SPPRECLFN	126	 /*  <DATA>SPPREC           - S9000 SPP & Recipe */
+#define	UMAXSPLFN	127	 /*  <DATA>UMAXSP           - Micromax SPP & Recipes */
+#define	GRPCTRLLFN	128	/*  <DATA>GRPCTL           - Group Control Config */
+#define	DMTLFN	129	 /*  <DATA>DMTBL            - deadman timer table */
+#define	TOURLFN	130	 /*  <DATA>GTOUR            - guard tour table */
+#define	IVRLFN	131	 /*  <DATA>IVRCFG           - IVR Interface config */
+#define	MASCLFN	132	 /*  <DATA>MAXASC           - Maximo Association */
+#define	GTSSLFN	133	 /*  <DATA>GTSSRT           - XLGTS alpha sorting */
+#define	GTSGLFN	134	 /*  <DATA>GTSGBL           - XLGTS global locations */
+#define	GTSCLFN	135	 /*  <DATA>GTSCNT           - XLGTS control locations */
+#define	GTSNLFN	136	 /*  <DATA>GTSNAM           - XLGTS location names */
+#define	XL10ZMLFN	137	 /*  <DATA>XL10ZM           - XL10 DA zone mngr list */
+#define	XL10XLLFN	138	 /*  <DATA>XL10XL           - XL10 DA XL10 list */
+#define	XL10SLLFN	139	 /*  <DATA>XL10SL           - XL10 DA XL10 field desc */
+#define	SECHIPLFN	140	 /*  <DATA>SECHIP           - SE Chip data */
+#define	ACSACTLFN	141	 /*  <DATA>ACSACT           - SE Chip Actions config */
+#define	EVTSEQLFN	142	 /*  <DATA>EVTSEQ           - SE Chip Event Action Seq config */
+/*     parameter (         =143) ;* */
+/*     parameter (         =144) ;* */
+#define	U800SPLFN	145	 /*  <DATA>U800SP           - UMC800 SPP & Recipe */
+#define	U800ADLFN	146	 /*  <DATA>U800AD           - UMC800 SPP & Recipe */
+
+#define	U01LFN	200	 /*  <DATA>UTBL01             - user table 1 */
+#define	U02LFN	201	 /*  <DATA>UTBL02             - user table 2 */
+#define	U03LFN	202	 /*  <DATA>UTBL03             - user table 3 */
+#define	U04LFN	203	 /*  <DATA>UTBL04             - user table 4 */
+#define	U05LFN	204	 /*  <DATA>UTBL05             - user table 5 */
+#define	U06LFN	205	 /*  <DATA>UTBL06             - user table 6 */
+#define	U07LFN	206	 /*  <DATA>UTBL07             - user table 7 */
+#define	U08LFN	207	 /*  <DATA>UTBL08             - user table 8 */
+#define	U09LFN	208	 /*  <DATA>UTBL09             - user table 9 */
+#define	U10LFN	209	 /*  <DATA>UTBL10             - user table 10 */
+#define	U11LFN	210	 /*  <DATA>UTBL11             - user table 11 */
+#define	U12LFN	211	 /*  <DATA>UTBL12             - user table 12 */
+#define	U13LFN	212	 /*  <DATA>UTBL13             - user table 13 */
+#define	U14LFN	213	 /*  <DATA>UTBL14             - user table 14 */
+#define	U15LFN	214	 /*  <DATA>UTBL15             - user table 15 */
+#define	U16LFN	215	 /*  <DATA>UTBL16             - user table 16 */
+#define	U17LFN	216	 /*  <DATA>UTBL17             - user table 17 */
+#define	U18LFN	217	 /*  <DATA>UTBL18             - user table 18 */
+#define	U19LFN	218	 /*  <DATA>UTBL19             - user table 19 */
+#define	U20LFN	219	 /*  <DATA>UTBL20             - user table 20 */
+#define	U21LFN	220	 /*  <DATA>UTBL21             - user table 21 */
+#define	U22LFN	221	 /*  <DATA>UTBL22             - user table 22 */
+#define	U23LFN	222	 /*  <DATA>UTBL23             - user table 23 */
+#define	U24LFN	223	 /*  <DATA>UTBL24             - user table 24 */
+#define	U25LFN	224	 /*  <DATA>UTBL25             - user table 25 */
+#define	U26LFN	225	 /*  <DATA>UTBL26             - user table 26 */
+#define	U27LFN	226	 /*  <DATA>UTBL27             - user table 27 */
+#define	U28LFN	227	 /*  <DATA>UTBL28             - user table 28 */
+#define	U29LFN	228	 /*  <DATA>UTBL29             - user table 29 */
+#define	U30LFN	229	 /*  <DATA>UTBL30             - user table 30 */
+#define	U31LFN	230	 /*  <DATA>UTBL31             - user table 31 */
+#define	U32LFN	231	 /*  <DATA>UTBL32             - user table 32 */
+#define	U33LFN	232	 /*  <DATA>UTBL33             - user table 33 */
+#define	U34LFN	233	 /*  <DATA>UTBL34             - user table 34 */
+#define	U35LFN	234	 /*  <DATA>UTBL35             - user table 35 */
+#define	U36LFN	235	 /*  <DATA>UTBL36             - user table 36 */
+#define	U37LFN	236	 /*  <DATA>UTBL37             - user table 37 */
+#define	U38LFN	237	 /*  <DATA>UTBL38             - user table 38 */
+#define	U39LFN	238	 /*  <DATA>UTBL39             - user table 39 */
+#define	U40LFN	239	 /*  <DATA>UTBL40             - user table 40 */
+#define	U41LFN	240	 /*  <DATA>UTBL41             - user table 41 */
+#define	U42LFN	241	 /*  <DATA>UTBL42             - user table 42 */
+#define	U43LFN	242	 /*  <DATA>UTBL43             - user table 43 */
+#define	U44LFN	243	 /*  <DATA>UTBL44             - user table 44 */
+#define	U45LFN	244	 /*  <DATA>UTBL45             - user table 45 */
+#define	U46LFN	245	 /*  <DATA>UTBL46             - user table 46 */
+#define	U47LFN	246	 /*  <DATA>UTBL47             - user table 47 */
+#define	U48LFN	247	 /*  <DATA>UTBL48             - user table 48 */
+#define	U49LFN	248	 /*  <DATA>UTBL49             - user table 49 */
+#define	U50LFN	249	 /*  <DATA>UTBL50             - user table 50 */
+#define	U51LFN	250	 /*  <DATA>UTBL51             - user table 51 */
+#define	U52LFN	251	 /*  <DATA>UTBL52             - user table 52 */
+#define	U53LFN	252	 /*  <DATA>UTBL53             - user table 53 */
+#define	U54LFN	253	 /*  <DATA>UTBL54             - user table 54 */
+#define	U55LFN	254	 /*  <DATA>UTBL55             - user table 55 */
+#define	U56LFN	255	 /*  <DATA>UTBL56             - user table 56 */
+#define	U57LFN	256	 /*  <DATA>UTBL57             - user table 57 */
+#define	U58LFN	257	 /*  <DATA>UTBL58             - user table 58 */
+#define	U59LFN	258	 /*  <DATA>UTBL59             - user table 59 */
+#define	U60LFN	259	 /*  <DATA>UTBL60             - user table 60 */
+#define	U61LFN	260	 /*  <DATA>UTBL61             - user table 61 */
+#define	U62LFN	261	 /*  <DATA>UTBL62             - user table 62 */
+#define	U63LFN	262	 /*  <DATA>UTBL63             - user table 63 */
+#define	U64LFN	263	 /*  <DATA>UTBL64             - user table 64 */
+#define	U65LFN	264	 /*  <DATA>UTBL65             - user table 65 */
+#define	U66LFN	265	 /*  <DATA>UTBL66             - user table 66 */
+#define	U67LFN	266	 /*  <DATA>UTBL67             - user table 67 */
+#define	U68LFN	267	 /*  <DATA>UTBL68             - user table 68 */
+#define	U69LFN	268	 /*  <DATA>UTBL69             - user table 69 */
+#define	U70LFN	269	 /*  <DATA>UTBL70             - user table 70 */
+#define	U71LFN	270	 /*  <DATA>UTBL71             - user table 71 */
+#define	U72LFN	271	 /*  <DATA>UTBL72             - user table 72 */
+#define	U73LFN	272	 /*  <DATA>UTBL73             - user table 73 */
+#define	U74LFN	273	 /*  <DATA>UTBL74             - user table 74 */
+#define	U75LFN	274	 /*  <DATA>UTBL75             - user table 75 */
+#define	U76LFN	275	 /*  <DATA>UTBL76             - user table 76 */
+#define	U77LFN	276	 /*  <DATA>UTBL77             - user table 77 */
+#define	U78LFN	277	 /*  <DATA>UTBL78             - user table 78 */
+#define	U79LFN	278	 /*  <DATA>UTBL79             - user table 79 */
+#define	U80LFN	279	 /*  <DATA>UTBL80             - user table 80 */
+#define	U81LFN	280	 /*  <DATA>UTBL81             - user table 81 */
+#define	U82LFN	281	 /*  <DATA>UTBL82             - user table 82 */
+#define	U83LFN	282	 /*  <DATA>UTBL83             - user table 83 */
+#define	U84LFN	283	 /*  <DATA>UTBL84             - user table 84 */
+#define	U85LFN	284	 /*  <DATA>UTBL85             - user table 85 */
+#define	U86LFN	285	 /*  <DATA>UTBL86             - user table 86 */
+#define	U87LFN	286	 /*  <DATA>UTBL87             - user table 87 */
+#define	U88LFN	287	 /*  <DATA>UTBL88             - user table 88 */
+#define	U89LFN	288	 /*  <DATA>UTBL89             - user table 89 */
+#define	U90LFN	289	 /*  <DATA>UTBL90             - user table 90 */
+#define	U91LFN	290	 /*  <DATA>UTBL91             - user table 91 */
+#define	U92LFN	291	 /*  <DATA>UTBL92             - user table 92 */
+#define	U93LFN	292	 /*  <DATA>UTBL93             - user table 93 */
+#define	U94LFN	293	 /*  <DATA>UTBL94             - user table 94 */
+#define	U95LFN	294	 /*  <DATA>UTBL95             - user table 95 */
+#define	U96LFN	295	 /*  <DATA>UTBL96             - user table 96 */
+#define	U97LFN	296	 /*  <DATA>UTBL97             - user table 97 */
+#define	U98LFN	297	 /*  <DATA>UTBL98             - user table 98 */
+#define	U99LFN	298	 /*  <DATA>UTBL99             - user table 99 */
+#define	U100LFN	299	 /*  <DATA>UTBL100           - user table 100 */
+#define	U101LFN	300	 /*  <DATA>UTBL101           - user table 101 */
+#define	U102LFN	301	 /*  <DATA>UTBL102           - user table 102 */
+#define	U103LFN	302	 /*  <DATA>UTBL103           - user table 103 */
+#define	U104LFN	303	 /*  <DATA>UTBL104           - user table 104 */
+#define	U105LFN	304	 /*  <DATA>UTBL105           - user table 105 */
+#define	U106LFN	305	 /*  <DATA>UTBL106           - user table 106 */
+#define	U107LFN	306	 /*  <DATA>UTBL107           - user table 107 */
+#define	U108LFN	307	 /*  <DATA>UTBL108           - user table 108 */
+#define	U109LFN	308	 /*  <DATA>UTBL109           - user table 109 */
+#define	U110LFN	309	 /*  <DATA>UTBL110           - user table 110 */
+#define	U111LFN	310	 /*  <DATA>UTBL111           - user table 111 */
+#define	U112LFN	311	 /*  <DATA>UTBL112           - user table 112 */
+#define	U113LFN	312	 /*  <DATA>UTBL113           - user table 113 */
+#define	U114LFN	313	 /*  <DATA>UTBL114           - user table 114 */
+#define	U115LFN	314	 /*  <DATA>UTBL115           - user table 115 */
+#define	U116LFN	315	 /*  <DATA>UTBL116           - user table 116 */
+#define	U117LFN	316	 /*  <DATA>UTBL117           - user table 117 */
+#define	U118LFN	317	 /*  <DATA>UTBL118           - user table 118 */
+#define	U119LFN	318	 /*  <DATA>UTBL119           - user table 119 */
+#define	U120LFN	319	 /*  <DATA>UTBL120           - user table 120 */
+#define	U121LFN	320	 /*  <DATA>UTBL121           - user table 121 */
+#define	U122LFN	321	 /*  <DATA>UTBL122           - user table 122 */
+#define	U123LFN	322	 /*  <DATA>UTBL123           - user table 123 */
+#define	U124LFN	323	 /*  <DATA>UTBL124           - user table 124 */
+#define	U125LFN	324	 /*  <DATA>UTBL125           - user table 125 */
+#define	U126LFN	325	 /*  <DATA>UTBL126           - user table 126 */
+#define	U127LFN	326	 /*  <DATA>UTBL127           - user table 127 */
+#define	U128LFN	327	 /*  <DATA>UTBL128           - user table 128 */
+#define	U129LFN	328	 /*  <DATA>UTBL129           - user table 129 */
+#define	U130LFN	329	 /*  <DATA>UTBL130           - user table 130 */
+#define	U131LFN	330	 /*  <DATA>UTBL131           - user table 131 */
+#define	U132LFN	331	 /*  <DATA>UTBL132           - user table 132 */
+#define	U133LFN	332	 /*  <DATA>UTBL133           - user table 133 */
+#define	U134LFN	333	 /*  <DATA>UTBL134           - user table 134 */
+#define	U135LFN	334	 /*  <DATA>UTBL135           - user table 135 */
+#define	U136LFN	335	 /*  <DATA>UTBL136           - user table 136 */
+#define	U137LFN	336	 /*  <DATA>UTBL137           - user table 137 */
+#define	U138LFN	337	 /*  <DATA>UTBL138           - user table 138 */
+#define	U139LFN	338	 /*  <DATA>UTBL139           - user table 139 */
+#define	U140LFN	339	 /*  <DATA>UTBL140           - user table 140 */
+#define	U141LFN	340	 /*  <DATA>UTBL141           - user table 141 */
+#define	U142LFN	341	 /*  <DATA>UTBL142           - user table 142 */
+#define	U143LFN	342	 /*  <DATA>UTBL143           - user table 143 */
+#define	U144LFN	343	 /*  <DATA>UTBL144           - user table 144 */
+#define	U145LFN	344	 /*  <DATA>UTBL145           - user table 145 */
+#define	U146LFN	345	 /*  <DATA>UTBL146           - user table 146 */
+#define	U147LFN	346	 /*  <DATA>UTBL147           - user table 147 */
+#define	U148LFN	347	 /*  <DATA>UTBL148           - user table 148 */
+#define	U149LFN	348	 /*  <DATA>UTBL149           - user table 149 */
+#define	U150LFN	349	 /*  <DATA>UTBL150           - user table 150 */
+
+
+/*--------- print group ----------------- */
+
+/*       integer*2  LPTLFN, PRFLFN, SPLLFN */
+#define	LPTLFN	21	 /*                           - 1st printer lfn */
+#define	PRFLFN	22	 /*                           - 1st print file lfn */
+#define	SPLLFN	23	 /*                           - 1st spool file lfn */
+
+/*     Number of lfn's = (# of printers)*3 + 20 */
+/*                     =         15(max)*3 + 20 */
+/*                     =         65 */
+
+/*--------------------------------------- */
+
+/*     Allow for expansion. */
+/*     Allow for floating/OS assigned lfn's. */
+
+/*       integer*2  NUM_LFNS */
+#define	NUM_LFNS	350	 /*   Therefore give groups 250 lfn's */
+

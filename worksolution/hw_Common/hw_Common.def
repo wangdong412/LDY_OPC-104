@@ -1,0 +1,6 @@
+; hw_Common.def : Declares the module parameters for the DLL.
+
+LIBRARY      "hw104_Common"
+
+EXPORTS
+    ; Explicit exports can go here

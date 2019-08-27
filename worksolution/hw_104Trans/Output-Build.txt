@@ -1,0 +1,21 @@
+1>------ Rebuild All started: Project: hw104_Common, Configuration: Release Win32 ------
+1>Deleting intermediate and output files for project 'hw104_Common', configuration 'Release|Win32'
+1>Compiling...
+1>stdafx.cpp
+1>Compiling...
+1>XDBLinkList.cpp
+1>XDBLatch.cpp
+1>WinErrMsg.cpp
+1>hw_Common.cpp
+1>HW_104Log.cpp
+1>ErrorMsg.cpp
+1>Compiling...
+1>dllmain.cpp
+1>Compiling resources...
+1>Microsoft (R) Windows (R) Resource Compiler Version 6.1.6723.1
+1>Copyright (C) Microsoft Corporation.  All rights reserved.
+1>Linking...
+1>LINK : fatal error LNK1104: cannot open file 'daouuid.lib'
+1>Build log was saved at "file://d:\MyProject\Drag\IEC104\hw_104Trans_Redun\build\hw104_Common\Release\BuildLog.htm"
+1>hw104_Common - 1 error(s), 0 warning(s)
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========

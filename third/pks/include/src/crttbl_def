@@ -1,0 +1,563 @@
+#if	!defined( CRTSZ )
+
+/*                             CRTTBL - crt control table */
+/*                             -------------------------- */
+
+/*     REVISION: */
+/*         @(#)crttbl_def,v	830.1.1.8 */
+
+/*     DESCRIPTION: */
+/*         The structure of the crt table is declared in this file. */
+/*         This table is indexed by the crt number. */
+
+
+/*         Note: Station security is implemented as 6 level as follows. */
+/*                             0 - inhibit alarm ack and data entry */
+/*                             1 - inhibit data entry */
+/*                             2 - dfd level 0 */
+/*                             3 - dfd level 1 */
+/*                             4 - dfd level 2 */
+/*                             5 - dfd level 3 */
+/*               If login is not used, then the base level is 2. */
+
+
+#if	!defined( POINT_SERVER )
+#if	!defined( HSC_POINT_SERVER )
+#include	"system"
+#include	"src/platform"
+#include	"src/hsctypes_def"
+#include	"src/contbl_def"
+#endif	
+#endif	
+
+#define	CRTSZ	2176 /*  size of a CRTTBL record */
+
+#define	XCHSZ	100 /*  world coordinates per character (x direction) */
+#define	YCHSZ	100 /*  world coordinates per character (y direction) */
+#define	DSPNMSZ	1024 /*  display name length */
+#define	IDLNMSZ	260 /*  idle display name length */
+#define	CRTNAM_SZ	16 /*  CRT name size in bytes */
+#define	CRTOID_SZ	25 /*  size of CRTOID in words */
+#define	LVLPSW_SZ	3 /*  size of level n passwords in words (same size as CONPSW_SZ defined in contbl) */
+#define	CRTDTS_SZ	41 /*  size of detail search string in words */
+#define	CRTDTN_SZ	41 /*  size of detail name string in words */
+#define	CRTCRD_SZ	8 /*  Length of card number in words */
+#define	CRTCVL_SZ	256 /*  Length of control value string in bytes */
+
+#define	STN_FMT_BRIEF	0x0001	 /*  brief station format (STN01 or CSTN01-2) as opposed to (STATION  1 or CONSOLE STATION  1) */
+#define	STN_FMT_UPPERCASE	0x0002	 /*  all uppercase (STN01) instead of (Stn01) */
+#define	STN_FMT_NOPREFIX	0x0004	 /*  don't use a prefix (eg STATION, CSTN, etc) */
+#define	MAX_STN_NAME_SZ	9  /*  max string size for station name (brief format, eg STN01 or CSTN01-2) */
+
+#define	CRTGRPS_SZ	16 /*  max number Groups Oper is a member of */
+#define	CRTIPADDR_SZ	8 /*  length of IP address string in words */
+#define	CRTIPNAME_SZ	16 /*  length of client machine name string in words */
+
+
+/*                                       5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                                      --------------------------------- */
+/*                FLAGS1              1 !A!B!C!D!E!F!G!H!I!J!K!L!M!N!O!P! */
+/*                                      --------------------------------- */
+#define	CRT_FLAGS1	1
+#define	STN_ONLINE	0x8000	 /*  15 A - CRT on-line */
+#define	STN_OK	0x4000	 /*  14 B - CRT (0=fail 1=OK) */
+#define	STN_SNDURG	0x2000	 /*  13 C - sound audible 3 (urgent) */
+#define	STN_SNDHGH	0x1000	 /*  12 D - sound audible 2 (high) */
+#define	STN_SNDLOW	0x0800	 /*  11 E - sound audible 1 (low) */
+#define	STN_SNDMSG	0x0400	 /*  10 E - sound audible message */
+#define	STN_SNDALT	0x0200	 /*   9 G - sound audible allert */
+#define	STN_SNDALL	0x3E00	 /*       - sound audible all */
+#define	STN_SILALL	0x0100	 /*   8 H - silence audible (all) */
+#define	STN_CANCEL	0x0080	 /*   7 I - cancel current operation */
+#define	STN_TERM	0x0040	 /*   6 J - request termination of display */
+/*					= z'0020' ;*  5 K - */
+#define	STN_PRTUPD	0x0010	 /*   4 L - print update */
+#define	STN_ALMUPD	0x0008	 /*   3 M - alarm update */
+#define	STN_PERUPD	0x0004	 /*   2 N - periodic update */
+#define	STN_FULUPD	0x0002	 /*   1 O - full update */
+#define	STN_NRMUPD	0x0001	 /*   0 P - normal update (changed data only) */
+
+#define	CRTFLAGS2	14
+/*                                      --------------------------------- */
+/*		FLAGS2              14 !A!B!C!D!E!F!G!H!I!J!K!L!M!N!O!P! */
+/*                                      --------------------------------- */
+/*					 = z'8000' ;* 15 A - display build mode */
+/*					 = z'4000' ;* 14 B - background build */
+/*					 = z'2000' ;* 13 C - shape build */
+/*					 = z'1000' ;* 12 D - builder page displayed */
+#define	STN_FREEZE	0x0800	 /*  11 E - all updates frozen */
+#define	OPRMSG_FREEZE	0x0400	 /*  10 F - operator message frozen */
+#define	STN_OPLGON	0x0200	 /*   9 G - operator logged on */
+#define	STN_TIMEOUTS	0x0100	 /*   8 H - station timeouts enabled */
+#define	STN_LOCKOUT	0x0080	 /*   7 I - station is locked out or not */
+#define	STN_RCRRD	0x0040	 /*   6 J - record change requires re display */
+#define	STN_SSSD	0x0020	 /*   5 K - station setting startup displays */
+#define	STN_ROTDSCNT	0x0010	 /*   4 L - signal ripsd to disconnect the rotary connection */
+/*					 = z'0008' ;*  3 M - */
+/*					 = z'0004' ;*  2 N - */
+/*					 = z'0002' ;*  1 O - */
+/*					 = z'0001' ;*  0 P - */
+
+#define	CRTFLAGS3	15
+/*                                      --------------------------------- */
+/*		FLAGS3              15 !A!B!C!D!E!F!G!H!I!J!K!L!M!N!O!P! */
+/*                                      --------------------------------- */
+/*                                        = z'8000' ;* 15 A - */
+#define	STN_ENOPLG	0x4000	 /*  14 B - enable operator login */
+#define	STN_IPOSTND	0x2000	 /*  13 C - enable IPOS trending */
+#define	STN_ENBURG	0x1000	 /*  12 D - enable audible 3 (urgent) */
+#define	STN_ENBHGH	0x0800	 /*  11 E - enable audible 2 (high) */
+#define	STN_ENBLOW	0x0400	 /*  10 F - enable audible 1 (low) */
+#define	STN_ENBMSG	0x0200	 /*   9 G - enable audible messages */
+#define	STN_ENBALT	0x0100	 /*   8 H - enable audible alerts */
+/*                                        = z'0080' ;*  7 I - */
+#define	STN_IDLCLR	0x0040	 /*   6 J - enable clear screen on idle timeout */
+/*                                        = z'0020' ;*  5 K - */
+/*                                        = z'0010' ;*  4 L - enable card image recall */
+#define	ACSEVT_2	0x0008	 /*   3 M - enable 2 line access event display */
+/*                                        = z'0004' ;*  2 N - */
+#define	STN_LOGERR	0x0002	 /*   1 O - enable crt error iorb print */
+#define	STN_ALMFAIL	0x0001	 /*   0 P - enable crt fail alarm */
+
+/*                                      --------------------------------- */
+/*                                   16 !X!     display number          ! */
+/*                                      --------------------------------- */
+/*                                        X - background displayed */
+
+/*                                      --------------------------------- */
+/*                CRTSTA             25 ! CRT state                     ! */
+/*                                      --------------------------------- */
+
+/*					  0 ;*  normal */
+#define	CRTSTA_PWC	1 /*   password change */
+#define	CRTSTA_PGC	2 /*   page callup */
+#define	CRTSTA_TDC	3 /*   trend callup */
+#define	CRTSTA_OGC	4 /*   operating group callup */
+#define	CRTSTA_TGC	5 /*   trend     group callup */
+#define	CRTSTA_HGC	6 /*   history   group callup */
+#define	CRTSTA_EVT	7 /*   user generated event */
+#define	CRTSTA_PVL	9 /*   new password validation */
+#define	CRTSTA_PCF	10 /*   new password confirm */
+#define	CRTSTA_CRQ	11 /*   control request */
+#define	CRTSTA_HUR	12 /*   hiway upload of RTU */
+#define	CRTSTA_HDR	13 /*   hiway download of RTU */
+#define	CRTSTA_HUC	14 /*   hiway upload of channel */
+#define	CRTSTA_HDC	15 /*   hiway download of channel */
+#define	CRTSTA_OPW	16 /*   old password check */
+#define	CRTSTA_CCF	17 /*   control confirmation request */
+#define	CRTSTA_DET	19 /*   point detail callup */
+#define	CRTSTA_CHD	20 /*   cardholder detail callup */
+#define	CRTSTA_SNC	21 /*   GDA Server Name Change Confirm request */
+#define	CRTSTA_SDL	22 /*   GDA server Name deletion confirm request */
+#define	CRTSTA_PSC	23 /*   Point Server Type Change confirm request */
+#define	CRTSTA_PSD	24 /*   Point Server Type deletion confirm request */
+#define	CRTSTA_PAC	25 /*   Page ack if nothing selected */
+#define	CRTSTA_DSC	26 /*   Direct Station Name Change Confirm request */
+#define	CRTSTA_DSD	27 /*   Direct Station Name deletion confirm request */
+#define	CRTSTA_AMC	28 /*   Area mapping option change confirm request */
+#define	CRTSTA_CAM	29 /*   Custom area mapping change confirm request */
+#define	CRTSTA_CNC	30 /*   Console Name Change Confirm request */
+#define	CRTSTA_CND	31 /*   Console Name deletion confirm request */
+
+/*                                      --------------------------------- */
+/*                CRTKBL             37 !A!  B  !   C   !  keyboard LRN ! */
+/*                                      --------------------------------- */
+
+#define	CRTKBL_WRD	37  /*  */
+#define	CRTKBD_BIT	8   /*  */
+#define	CRTKBD_WTH	4   /*  */
+#define	KBD_ONLINE	0x8000	 /*  15 A - keyboard connected */
+#define	STN_DGTYPE	0x7000	 /*  12 B - display generator type (0- 7) */
+#define	STN_KBDTYPE	0x0F00	 /*   8 C - keyboard type          (0-15) */
+/* 						   ;*         0 - not implemented */
+#define	IPS10	1	   /*          1 - ips with 10 fn keys */
+#define	AYDIN	2	   /*          2 - aydin */
+#define	IPS12	13	   /*         13 - ips with 12 fn keys */
+#define	IPS3	14	   /*         14 - ips with TDC3000 station */
+#define	TDC3	15	   /*         15 - TDC3000 universal station */
+#define	STN_KBDLRN	0x00FF	  /*   0 D - keyboard lrn (not used) */
+
+/*                                      --------------------------------- */
+/*                CRTIND             41 !A!B!C!D!E!F!G!H!I!J!K!L!M!N!O!P! */
+/*                                      --------------------------------- */
+/*					Indicators */
+#define	IND_MORE	15 /*  A - more data on next page */
+#define	IND_CRQV	14 /*  B - control request value valid */
+#define	IND_PAGELOADED	13 /*  C - page loaded (at station) */
+#define	IND_IMAGEHELD	12 /*  D - display is being held for image display */
+#define	IND_TAGNOTFOUND	11 /*  E - tag not found on tag search operation */
+#define	IND_AUTOSELECT	10 /*  F - autoselect in progress */
+#define	IND_HENDRIX	9 /*  G - on a HENDRIX page */
+#define	IND_PNTDTL	8 /*  H - point detail in progress */
+#define	IND_PRVDSP	7 /*  I - previous display in progress */
+#define	IND_SUMRPT	6 /*  J - indicates summary report print in progress */
+#define	IND_WNDPAGREQ	5 /*  K - windowed page request in progress */
+#define	IND_SrvInfoSent	4 /*  L - server information sent */
+/*						    M - */
+/*						    N - */
+/*						    O - */
+/*						    P - */
+
+/*                                      --------------------------------- */
+/*                CRTCNT             73 |A|B|C|D| level | control level | */
+/*                                      --------------------------------- */
+#define	CRTCNT_WRD	73  /*  */
+
+#define	CRT_ForceTolerance	14 /*   B - allow write of out-of-tolerance value */
+#define	CRT_ForceRange	13 /*   C - allow write of out-of-range value */
+#define	CRT_CMSONLY_BIT	12 /*   D - Only allow Card Managment operations */
+
+/*                               level - security level, calculated value */
+#define	STN_LEVEL_MASK	0x0f00	  /*   field mask */
+#define	STN_LEVEL_OFFSET	8        /*   bit offset */
+
+/*                               control level */
+#define	STN_CNTLVL_MASK	0x00ff	   /*   field mask */
+#define	STN_CNTLVL_OFFSET	0         /*   bit offset */
+
+/*                                       level - station security level (0-15) */
+#define	STN_LVL1	0x00			/*  inhibit alarm ack and data entry */
+#define	STN_LVL2	0x01			/*  inhibit data entry */
+#define	STN_OPER	0x02			/*  dfd level 0 */
+#define	STN_SUPR	0x03			/*  dfd level 1 */
+#define	STN_ENGR	0x04			/*  dfd level 2 */
+#define	STN_MNGR	0x05			/*  dfd level 3 */
+#define	STN_LVLM	0x0f			/*  station level mask */
+/*					these flags in GDA security Station Level */
+#define	STN_RANG	0x10			/*  range flag (for CDA controls) */
+#define	STN_PROG	0x20			/*  program */
+#define	STN_TOLE	0x40			/*  tolerance flag (for CDA controls) */
+
+/*					level indicator uses acronyms 265 to 280 */
+/*					alarm indicator uses acronyms 596 to 599 */
+
+
+/*                                      --------------------------------- */
+/*                CRTCNT2            98 |A|B|C|D|E|F|G|H| IKB SL| STN SL| */
+/*                                      --------------------------------- */
+#define	CRTCNT2_WRD	98  /*  */
+
+/*                               IKB SL - security level from IKB */
+#define	STN_IKB_LEVEL_MASK	0x00f0	  /*   field mask */
+#define	STN_IKB_LEVEL_OFFSET	4        /*   bit offset */
+/*                               STN SL - security level from Station */
+#define	STN_STN_LEVEL_MASK	0x000f	  /*   field mask */
+#define	STN_STN_LEVEL_OFFSET	0        /*   bit offset */
+/*         see CRTCNT for valid security levels for these fields */
+/*         these fields used to calculate level field in CRTCNT */
+#define	STN_SECLVL_CALCONLY	0        /*   Calculate Sec Lvl only */
+#define	STN_SECLVL_DEFAULT	1        /*   Reset Station Sec Level */
+#define	STN_SECLVL_SOFTWARE	2        /*   Set Station Sec Lvl */
+#define	STN_SECLVL_IKB	3        /*   Set IKB Sec Lvl */
+#define	STN_SECLVL_DEFAULT_ALL	4        /*   Reset Station & IKB Sec Level */
+
+
+/*       integer*2  CRTPGRHR       ;*     --------------------------------- */
+#define	CRTPGRHR	99	   /*   99 ! Pager RequestTask return code ! */
+/*       integer*2  CRTPGRCKIE     ;*     --------------------------------- */
+#define	CRTPGRCKIE	100	/*  100 ! Pager RequestTask cookie      ! */
+/*                                      --------------------------------- */
+
+/*                                      --------------------------------- */
+/*                CRTASFN           173 ! A ! B ! C ! D ! E ! F ! G ! H ! */
+/*                                      --------------------------------- */
+/*				Functions that can be redirected to an assocated */
+/*				station defined by a 2 bit field (0 = current) */
+#define	AssDspStnM	0x0003	 /*  A = assicated display  mask */
+#define	AssDspStnB	14  /*  A = assicated display  bit */
+#define	DtlDspStnM	0x0003	 /*  B = detail display  mask */
+#define	DtlDspStnB	12  /*  B = detail display  bit */
+#define	TndDspStnM	0x0003	 /*  C = trend display  mask */
+#define	TndDspStnB	10  /*  C = trend display  bit */
+#define	GrpDspStnM	0x0003	 /*  D = group display  mask */
+#define	GrpDspStnB	8  /*  D = group display  bit */
+
+#define	CRTFLAGS4	174
+/*                                      --------------------------------- */
+/*                FLAGS4            174 !A!B!C!D!E!F!G!H!I!J!K!L!   M   ! */
+/*                                      --------------------------------- */
+/*					More option flags */
+#define	AAL_IFNOTON	0x8000	 /*  15 A - allow audible alarm when signed off */
+/*					 = z'4000' ;* 14 B - spare */
+/*					 = z'2000' ;* 13  C - spare */
+/*					 = z'1000' ;* 12  D - spare */
+/*					 = z'0800' ;* 11  E - spare */
+/*					 = z'0400' ;* 10  F - spare */
+/*					 = z'0200' ;* 9  G - spare */
+/*					 = z'0100' ;* 8  H - spare */
+#define	STN_ENBLOC	0x0080	 /*  7  I - enable status zone/alarm line localization */
+#define	STN_IKBKSWDS	0x0040	 /*  6  J - IKB KeySwitch Support disabled */
+#define	STN_SNGLSGN	0x0020	 /*  5 K - Did operator sign on using single signon (mask) */
+#define	STN_SNGLSGNO	2       /*  5 K - Did operator sign on using single signon (offset) */
+#define	STN_SSOALWD	0x0010	 /*  4 L - Is Single signon allowed for this Station (mask) */
+#define	STN_SSOALWDO	1       /*  4 L - Is Single signon allowed for this Station (offset) */
+#define	STN_SOMTRNS	0x000F	 /*  3-0 M - Signon Manager Transition (4 bits) (mask) */
+#define	STN_SOMTRNSO	0       /*  3-0 M - Signon Manager Transition (4 bits) (offset) */
+
+/*                                      --------------------------------- */
+/*                FLAGS5       ;*   175 !A!B!C!D!E!F!G!H!I!J!K!L!M!N!O!P! */
+/*                                      --------------------------------- */
+/*					More option flags */
+/*                                        ;* 15 A - */
+
+/*       integer*2  CRTAAL       ;*       --------------------------------- */
+#define	CRTAAL	176	 /*   176 ! | |t|m|s|u|h|l| | |T|M|a|U|H|L! */
+/*                                      --------------------------------- */
+
+#define	AAL_ON	0x0008	 /*  a - Any Audible Alarm Sounding */
+#define	UAL_ON	0x0004	 /*  U - Urgent Audible Alarm Sounding */
+#define	HAL_ON	0x0002	 /*  H - High Audible Alarm Sounding */
+#define	LAL_ON	0x0001	 /*  L - Low Audible Alarm Sounding */
+#define	MAL_ON	0x0010	 /*  M - Message Audible Alarm Sounding */
+#define	TAL_ON	0x0020	 /*  T - Alert Audible Alarm Sounding */
+
+#define	AST_ON	0x0800	 /*  s - Alarms Silenced Temporarily by Timer */
+#define	UST_ON	0x0400	 /*  u - Urgent Audible Alarm Silenced by Timer */
+#define	HST_ON	0x0200	 /*  h - High Audible Alarm Silenced by Timer */
+#define	LST_ON	0x0100	 /*  l - Low Audible Alarm Silenced by Timer */
+#define	MST_ON	0x1000	 /*  m - Message Audible Alarm Silenced by Timer */
+#define	TST_ON	0x2000	 /*  t - Alert Audible Alarm Silenced by Timer */
+
+/*       integer*2  CRTNAM       ;*       --------------------------------- */
+#define	CRTNAM	180	 /*    180 ! station name (16 characters)  ! */
+/*                                      --------------------------------- */
+/*       			      ;*       --------------------------------- */
+/*       			      ;*   206 ! Station connection type       ! */
+/*                                      --------------------------------- */
+/*     Note: the following settings are also defined by include\src\nips_protocol.h */
+
+#define	CRTTYP_STATION	0x0000			/*  regular station */
+#define	CRTTYP_BROWSER	0x0001			/*  browser station */
+#define	CRTTYP_DIRECT	0x0002			/*  direct station station */
+#define	CRTTYP_CONFIG	0x0003			/*  configuration studio station */
+#define	CRTTYP_PABLO	0x0004			/*  PABLO (web based)  station */
+#define	CRTTYP_MULTITYPE_STATION	0x0010		/*  multi-window regular station */
+#define	CRTTYP_MULTITYPE_DIRECT	0x0012			/*  multi-window direct station station */
+#define	CRTTYPE_MASK	0x000F			/*  mask of the base station type */
+#define	CRTTYPE_MULTIWINDOW_MASK	0x0010		/*  mask of the multiwindow bit */
+
+/*                                      --------------------------------- */
+/*                                  215 ! inhibit printouts (crt)       ! */
+/*                                      --------------------------------- */
+/*                                  216 ! inhibit printouts (operator)  ! */
+/*                                      --------------------------------- */
+/*                                        bit 0 - inhibit ALL message printout */
+/*                                        bit n - inhibit priority n */
+/*                                               (refer PRTQUE_DEF) */
+/*       integer*2  CRTSAP       ;*       --------------------------------- */
+#define	CRTSAP	217	 /*    217 ! pnt schedule add point number ! */
+/*       integer*2  CRTSAA       ;*       --------------------------------- */
+#define	CRTSAA	218	 /*    218 ! pnt schedule add param number ! */
+/*                                      --------------------------------- */
+
+/*       integer*2  CRTOID       ;*       --------------------------------- */
+#define	CRTOID	225	 /*    225 ! Oper ID incl domain/machine   ! */
+/*                                      ! name (50 chars)               ! */
+/*                                      --------------------------------- */
+
+/*       integer*2  CRTAAM       ;*       --------------------------------- */
+#define	CRTAAM	333	 /*    333 ! Area assignment map (crt)     ! */
+/*                                  ... ! (1023 areas, 16 per word)     ! */
+/*                                  380 ! (64 words total)              ! */
+/*       integer*2  CRTOAM       ;*       --------------------------------- */
+#define	CRTOAM	397	 /*    397 ! Area assignment map (operator)! */
+/*                                  ... ! (1023 areas, 16 per word)     ! */
+/*                                  460 ! (64 words total)              ! */
+/*                                      --------------------------------- */
+/*                CRTCAPM           461 ! Area permission map (crt)     ! */
+/*                                  ... ! (1023 areas, 8 per word)      ! */
+/*                                  588 ! (128 words total)             ! */
+/*                                      --------------------------------- */
+/*                CRTOAPM           589 ! Area permission map (operator)! */
+/*                                  ... ! (1023 areas, 8 per word)      ! */
+/*                                  716 ! (128 words total)             ! */
+/*                                      --------------------------------- */
+#define	APM_FULL	0	/*  can read, write, acknowledge */
+#define	APM_ACKN	1	/*  can read, acknowledge */
+#define	APM_READ	2	/*  can read */
+#define	APM_DENY	3	/*  denied */
+
+/*       integer*2  CRTIPADDR       ;*    --------------------------------- */
+#define	CRTIPADDR	861	 /*  861! IP Address (8 words)          ! */
+/*       integer*2  CRTIPNAME       ;*    --------------------------------- */
+#define	CRTIPNAME	869	 /*  869! IP Name (16 words)            ! */
+/*                                      --------------------------------- */
+
+#if	!defined( POINT_SERVER )
+#if	!defined( HSC_POINT_SERVER )
+
+
+
+/*     STRUCTURE: */
+
+	struct t_CRTTBL {
+		/* sequence */
+		int2   flags1;		/*    1 crt flags */
+		int2   crtsli;		/*    2 select index */
+		int2   crtsxc;		/*    3 select x coord */
+		int2   crtsyc;		/*    4 select y coord */
+		int2   crtsid;		/*    5 select object id */
+		int2   crtssq;		/*    6 select sequence number */
+		int2   spare7;		/*    7 select... */
+		int2   crtstr;		/*    8 select timer */
+		int2   crtftr;		/*    9 freeze timer */
+		int2   crtitr;		/*   10 invalid request timer */
+		int2   crtatr;		/*   11 audible alarm timer */
+		int2   crtrtr;		/*   12 re-alarm timer */
+		int2   crtidt;		/*   13 crt idle timer */
+		int2   flags2;		/*   14 crt flags 2 */
+		int2   flags3;		/*   15 crt flags 3 */
+		int2   dspnum;		/*   16 display number */
+		int2   dsptyp;	 	/*   17 display type */
+		int2   wndactv[4];		/*   18 window active map */
+		int2   crtarl;		/*   22 alarm update rate limit timer */
+		int2   crtpri;		/*   23 log and alarm printer numbers */
+		int2   crtpxc;		/*   24 pushbutton x coord */
+		int2   crtpyc;		/*   25 pushbutton y coord */
+		int2   lvl3psw[LVLPSW_SZ];  /*   26 level 3 password (no login) */
+		int2   lvl4psw[LVLPSW_SZ];  /*   29 level 4 password (no login) */
+		int2   lvl5psw[LVLPSW_SZ];  /*   32 level 5 password (no login) */
+		int2   spare35[37-35];	/*   35 */
+		int2   crtkbl;		/*   37 keyboard lrn */
+		int2   crtsta;		/*   38 crt state */
+		int2   crtstawnd;		/*   39 crt state window */
+		int2   crtltp;		/*   40 loop tune time period (1 min, 1 hour, etc) */
+		int2   crtind;		/*   41 indicators */
+		int2   crtas1;		/*   42 associated CRT 1 */
+		int2   crtas2;		/*   43 associated CRT 2 */
+		int2   crt2nd;		/*   44 secondary crt number */
+		int2   nrmupd;		/*   45 normal update period of window */
+		int2   fstupd;		/*   46 fast update period for window */
+		int2   crthty;		/*   47 history type */
+		int2   crthnm;		/*   48 history number */
+		int2   crthod;		/*   49 history offset (date) */
+		int2   crthot;		/*   50 history offset (time) */
+		int2   crthtp;		/*   51 history time period (1 min, 1 hour, etc) */
+		int2   crtcst;		/*   52 interface_type(controller status summary) */
+		int2   crtcsn;		/*   53 interface_num (controller status summary) */
+		int2   crtcsi;		/*   54 interface_index(controller status summary) */
+		int2   spare55[66-55];	/*   55 */
+		int2   crtnxtcrt;		/*   66 next display goes to this crt */
+		int2   crtnxtcxx;		/*   67 next display goes to this CSTNxx */
+		int2   crtnxtcyy;		/*   68 next display goes to this CSTNxx-y */
+		HSCTIME crtlckrel;	/*   69 time that station lockout is lifted */
+		int2   crtcnt;		/*   73 operator level */
+		int2   crtcpt;		/*   74 control point number */
+		int2   crtcpm;		/*   75 control parameter */
+		int2   crtcpo;		/*   76 control parameter offset */
+		double crtcvl;		/*   77 control value */
+		int2   crtcli;		/*   81 control index */
+		int2   crtcid;		/*   82 control object id */
+		int2   crtcsq;		/*   83 control sequence number */
+		int2   crtcps[87-84];	/*   84 control spare */
+		int2   crtomn;		/*   87 operator message number */
+		int2   crtoito;		/*   88 operator idle timeout value */
+		int2   crtdht;		/*   89 point detail page hold time */
+					/*      If < 0 then auto callup disabled */
+		int2   crtfll;		/*   90 no of failed login attemts */
+		int2   crtono;		/*   91 operator record number */
+		int2   crtoxc;		/*   92 operator prompt X coord */
+		int2   crtoyc;		/*   93 operator prompt Y coord */
+		int2   crtarc;		/*   94 alarm record number */
+		int2   crtapt;		/*   95 alarm point number */
+		int2   crtapm;		/*   96 alarm parameter number */
+		int2   spare97[98-97];	/*   97 */
+		int2   crtcnt2;		/*   98 security level component values from STN & IKB */
+		int2   crtpgrhr;		/*   99 Pager RequestTask return code */
+		int2   crtpgrckie;		/*  100 Pager RequestTask cookie */
+		int2   crtdpt;		/*  101 duress control point type/number */
+		int2   crtdpm;		/*  102 duress control parameter */
+		float  crtdpv;		/*  103 duress control value */
+		int2   crtheartbeat;	/*  105 do full update every this seconds */
+		int2   crtfli;		/*  106 focus index */
+		int2   crtfxc;		/*  107 focus x coord */
+		int2   crtfyc;		/*  108 focus y coord */
+		int2   crtfid;		/*  109 focus object id */
+		int2   crtfsq;		/*  110 focus sequence number */
+		int2   crtdlrn;		/*  111 lrn of DSPLY task */
+		int2   crtklrn;		/*  112 lrn of KBDSV task */
+		int2   spare113[171-113];	/*  113 */
+		int2   dfdcnt;              /*  171 DFD count */
+		int2   crtas3;		/*  172 associated CRT 3 */
+		int2   crtasfn;		/*  173 functions redirected to associated crts */
+		int2   flags4;		/*  174 crt flags 4 - even more options */
+		int2   flags5;		/*  175 crt flags 5 - */
+		int2   crtaal;		/*  176 audible alarm sounding */
+		int2   spare177[179-177];	/*  177 */
+		int2   crtpdp;		/*  179 point detail point number */
+		int2   crtnam[CRTNAM_SZ/2];	/*  180 station name (16 characters) */
+		int2   crtrel;		/*  188 station release number */
+		int2   crtmnr;		/*  189 station minor release number */
+		int2   crtuna[16];		/*  190 alarm counts (see asstbl_def) */
+		int2   crttyp;		/*  206 station type (multi-window etc) */
+		HSCTIME crtlft;  		/*  207 last function time (HSCTIME) */
+		int2   crtrtu;		/*  211 Camera switcher rtu number */
+		int2   crtccn;		/*  212 Camera number */
+		int2   crtcmn;		/*  213 Camera Monitor */
+		int2   crtcmd;		/*  214 Command number (CMDTBL) */
+		int2   crtpin;		/*  215 inhibit printouts (crt) */
+		int2   crtoin;		/*  216 inhibit printouts (operator) */
+		int2   crtsap;		/*  217 schedule add point */
+		int2   crtsaa;		/*  218 schedule add parameter */
+		float  crtsav;		/*  219 schedule add value */
+		int2   crtsad;		/*  221 schedule add date */
+		int2   crtsat;		/*  222 schedule add time */
+		int2   crtsay;		/*  223 schedule add type */
+		int2   crtsar;		/*  224 schedule add priority */
+		int2   crtoid[CRTOID_SZ];	/*  225 Oper ID incl domain/machine name (50 chars) */
+		int2   attempt;		/*  250 display callup attempt */
+		int4   filoff;		/*  251 data file offset */
+		int4   recoff;		/*  253 data record offset */
+		int4   fldoff;		/*  255 crt field offset */
+		int2   crtdts[CRTDTS_SZ];	/*  257 PNTDTL tag search string (82 ch) */
+		int2   crtsrchloc;		/*  298 PNTDTL search location */
+		int2   crtsrchflg;		/*  299 PNTDTL search flags */
+		int2   spare300[303-300];   /*  300 */
+		int2   crtcrd[CRTCRD_SZ];	/*  303 Card Number for detail callup (16 ch) */
+		int2   crtnumgrps;          /*  311 Number of Groups Oper is a member of */
+		int2   crtgrps[CRTGRPS_SZ]; /*  312 Groups Oper is a member of */
+		int2   spare328[331-328];   /*  328 */
+		int2   crtaap;		/*  331 Area profile record number (crt) */
+		int2   crtoap;		/*  332 Area profile record number (operator) */
+		int2   crtaam[64];		/*  333 area assignment map (crt) */
+		int2   crtoam[64];		/*  397 area assignment map (operator) */
+		int2   crtcapm[128];	/*  461 area permission map (crt) */
+		int2   crtoapm[128];	/*  589 area permission map (operator) */
+		int2   spare717[721-717];	/*  717 spare */
+		int2   crtadn;		/*  721 alarm previous display */
+		int2   crtadt;		/*  722 alarm previous display type */
+		int4   crtafo;		/*  723 alarm previous file offset */
+		int4   crtaro;		/*  725 alarm previous record offset */
+		int4   crtafl;		/*  727 alarm previous filed offset */
+		int2   crtaar;		/*  729 alarm previous alarm record */
+		int2   crtasp1;		/*  730 alarm previous spare */
+		int2   crtipg[130];		/*  731 idle timeout page */
+		int2   crtipaddr[CRTIPADDR_SZ]; /*  861 IP address */
+		int2   crtipname[CRTIPNAME_SZ]; /*  869 client machine name (16 chars+16 reserved) */
+		int2   crtoidname[CRTOID_SZ]/*  885 operator ID full name (50 chars) */;
+		int2   crtdtn[CRTDTN_SZ];	/*  910 Last PNTDTL tagname (82 ch) */
+		int4   crtdtt;		/*  951 Last PNTDTL tagtype */
+		int4   crtdtr;		/*  953 Last PNTDTL tagnumber */
+		int4   crtdtp;		/*  955 Last PNTDTL display page */
+		int2   spare957[965-957];	/*  957 */
+/*					;*     48 LEDs, State map have 2 bits per LED */
+/*					;*     See LED_FUN for LED state definitions */
+		int2   LedRedState[6];	/*  965 red led state map */
+		int2   LedYelState[6];	/*  971 yellow led state map */
+		int2   LedPnts[CRTNUMLEDPNTS];  /*  977 point associated with LED */
+		int2   dspnam[512];		/*  1025 current display name */
+		int2   crtadnm[512];	/*  1537 alarm previous display name */
+		int2   crtcvlch[CRTCVL_SZ/2]; /*  2049 control value (DT_CHAR) */
+	};			/*  2177 */
+
+#if	defined(COMMON_EXISTS)
+/*       type (t_CRTTBL) GBcrttbl(NUM_CRTS) */
+/*       equivalence (CRTTBL , GBcrttbl) */
+#endif	
+
+#include	"src/wndtbl_def"
+
+#endif	
+#endif	
+
+#endif	

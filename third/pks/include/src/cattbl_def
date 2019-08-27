@@ -1,0 +1,138 @@
+#if	!defined( CATTBLSZ )
+
+/*                   CATTBL - Notification Category table */
+/*                   ------------------------------------ */
+
+/*     REVISION: */
+/*         @(#)cattbl_def,v	830.1 */
+
+/*     DESCRIPTION: */
+/*         The structure of the CAT table is declared in this file. */
+/*         There is one record per alarm category. */
+
+/*     DEPENDENCIES: */
+
+#include	"system"
+
+/*     DEFINITIONS: */
+
+/*       integer*2  CATTBLSZ, CATTBLNM, CATUNDEFINED */
+#define	CATTBLSZ	64		/*  record size */
+#define	CATTBLNM	50		/*  number of record */
+#define	CATUNDEFINED	0		/*  undefined category */
+
+
+/*       integer*2  CATRAWSZ, CATNAMSZ, CATDESSZ, CATDEFMAPSZ */
+#define	CATRAWSZ	20		/*  must be even */
+#define	CATNAMSZ	20		/*  must be even */
+#define	CATDESSZ	40		/*  must be even */
+#define	CATDEFMAPSZ	10		/*  must be even */
+
+/*				             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*       integer*2  CATNAM    ;*                --------------------------------- */
+#define	CATNAM	1	/*            1,10 ! category name (I18N)(20 char) ! */
+/*       integer*2  CATDES    ;*                --------------------------------- */
+#define	CATDES	11	/*           11,20 ! category desc (I18N)(40 char) ! */
+/*       integer*2  CATRAW    ;*                --------------------------------- */
+#define	CATRAW	31	/*           31,40 ! raw category name             ! */
+/*			   		     ! this is not I18N (20 char)    ! */
+/*                                            --------------------------------- */
+/*			                  41 ! flags                         ! */
+/*				             !P|O|N|M|L!K!J!I!H!G!F!E!D!C!B!A! */
+/*                                            --------------------------------- */
+/*					       A - this is a system category */
+/*					       B - this is a well-known interface category */
+/*                                             --------------------------------- */
+/*                                         42 ! Spare                         ! */
+/*                                             --------------------------------- */
+/*                                      43,44 ! Category ID                   ! */
+/*       integer*2  CATTYP    ;*                --------------------------------- */
+#define	CATTYP	45	/*           45,46 ! OPC category type             ! */
+/* 					     !(simple,tracking,condition)    ! */
+/*       integer*2  CATATTRIBMAP     ;*         --------------------------------- */
+#define	CATATTRIBMAP	47	/*    47,56 ! one bit per attribute         ! */
+/*			   		     ! indicates attribute belongs   ! */
+/*			   		     ! to this category              ! */
+/*                                            --------------------------------- */
+/*                                      57-64 ! spare                         ! */
+/*				             --------------------------------- */
+
+/*       integer*2  MAXCATEGORY  */
+#define	MAXCATEGORY	CATTBLNM	
+/*       integer*2  MINCATEGORY  */
+#define	MINCATEGORY	1	
+/*       integer*2  CAT_PROCESS_ALARM */
+#define	CAT_PROCESS_ALARM	1		
+/*       integer*2  CAT_POINT_ALARM */
+#define	CAT_POINT_ALARM	2		
+/*       integer*2  CAT_SYSTEM_ALARM */
+#define	CAT_SYSTEM_ALARM	3		
+/*       integer*2  CAT_INFO_MESSAGE */
+#define	CAT_INFO_MESSAGE	4		
+/*       integer*2  CAT_CARD_ACCESS */
+#define	CAT_CARD_ACCESS	5		
+/*       integer*2  CAT_FIRE_ALARM */
+#define	CAT_FIRE_ALARM	6		
+/*       integer*2  CAT_OPER_CHANGE */
+#define	CAT_OPER_CHANGE	7		
+/*       integer*2  CAT_SYSTEM_CHANGE */
+#define	CAT_SYSTEM_CHANGE	8		
+/*       integer*2  CAT_SOE */
+#define	CAT_SOE	9		
+/*       integer*2  CAT_CONF_MESSAGE */
+#define	CAT_CONF_MESSAGE	11		
+/*       integer*2  CAT_PROCESS_EVENT */
+#define	CAT_PROCESS_EVENT	12	
+/*       integer*2  CAT_POINT_EVENT */
+#define	CAT_POINT_EVENT	13	
+/*       integer*2  CAT_SYSTEM_EVENT */
+#define	CAT_SYSTEM_EVENT	14	
+/*       integer*2  CAT_FIRE_EVENT */
+#define	CAT_FIRE_EVENT	15	
+/*       integer*2  CAT_ACCESS_ALARM */
+#define	CAT_ACCESS_ALARM	16	
+/*       integer*2  CAT_PROCESS_ALERT */
+#define	CAT_PROCESS_ALERT	17	
+/*       integer*2  CAT_SIMPLE_ALERT */
+#define	CAT_SIMPLE_ALERT	18	
+/*       integer*2  CAT_BATCH_ALARM */
+#define	CAT_BATCH_ALARM	19	
+/*       integer*2  CAT_BATCH_EVENT */
+#define	CAT_BATCH_EVENT	20	
+/*       integer*2  CAT_PROCEDURE_EVENT */
+#define	CAT_PROCEDURE_EVENT	21	
+
+
+#if	!defined( inside_IDL )
+
+
+
+
+struct cattbl
+    {
+    int2  I18NName[CATNAMSZ/2];	/* localised category name   */
+    int2  Description[CATDESSZ/2];	/* category decription	     */
+    int2  RawName[CATNAMSZ/2];	/* raw name - not localised  */
+    int2  Flags;			/* flags  */
+    int2  spare;
+    int4  ID;				/* category Identifier      */
+    int4  Type;			/* OPC category type (simple,tracking,condition)*/
+    int2  AttribMap[CATDEFMAPSZ];	/* map of attributes for this category  */
+    int2  Spare[64-56];		/* spare words */
+    };
+
+
+
+EXTERN_C unsigned short GetCategoryList(unsigned long, unsigned short **, unsigned long *);
+EXTERN_C unsigned short GetCategoryRawName(unsigned int,char *,unsigned short);
+EXTERN_C unsigned int GetCategoryIndex(char *);
+EXTERN_C unsigned short GetCategoryI18Name(unsigned int, char *, unsigned short);
+EXTERN_C unsigned int GetCategoryIndexFromOPCId(int2);
+EXTERN_C int4 GetCategoryOPCIdFromIndex(unsigned int);
+EXTERN_C int2 hsc_getapicattype(int4 *);
+
+
+
+
+#endif	
+#endif	

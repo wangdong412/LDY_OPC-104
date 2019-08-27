@@ -1,0 +1,183 @@
+#if	!defined(PNTALM_WORD)
+
+/*                    POINTS_DEF - point definitions */
+/*                    ------------------------------ */
+
+/************************************************************************ */
+/*****     COPYRIGHT 2001-2004      HONEYWELL LIMITED AUSTRALIA      **** */
+/************************************************************************ */
+
+/*     REVISION: */
+/*         @(#)points_def,v	830.1.1.3 */
+
+/*     WARNING: */
+/*	These definitions are dependent on points.h structure definitions. */
+/*	They are declared here because they need to be consumed by more than */
+/*	just C code. They should only be modified inconjuction with points.h. */
+
+/*     INCLUDES: */
+#include	"src/dat000_def"
+#include	"src/ext000_def"
+#include	"src/cnt000_def"
+#include	"src/des000_def"
+
+/*   Options for the hsc_point_name_ex function */
+
+#define	TAGNAME_PREPEND_OWNER_IF_REMOTE_DUPLICATE	0
+#define	TAGNAME_NEVER_PREPEND_OWNER	1
+#define	TAGNAME_ALWAYS_PREPEND_OWNER	2
+
+/*   Options for the hsc_param_values_xxx function */
+
+#define	PUTVAL_READ_AFTER_WRITE	0x00010	
+#define	GETVAL_ACQUIRE_IF_OLD	0x00020	
+#define	AGGREGATE_OFFSET	0
+#define	LOCAL_OFFSET	1
+
+/*   Maximum point and paramater name and value string lengths */
+
+#define	MAX_POINT_NAME_LEN	PRMDEF_LENGTH(PRNAM)		/*  The maximum length of a point name */
+#define	MAX_PARAM_NAME_LEN	255			/*  The maximum length of a parameter name */
+#define	MAX_PARAM_VALUE_STRING_LEN	255			/*  The maximum string length that can be stored in a parameter value (DFD can only do this) */
+#define	MAX_PRE750_POINT_NAME_LEN	16			/*  The maximum length of a point name for servers prior to 750 */
+#define	PNT_ENTITYNAME_SZ	40			/*  Point entitiy name size */
+#define	MAX_ENTITYNAME_SZ	PNT_ENTITYNAME_SZ	/*  The maximum length of an entity name */
+#define	MAX_FULLNAME_SZ	200			/*  The maximum length of a fully qualified name */
+#define	MAX_BASETAGNAME_SZ	MAX_POINT_NAME_LEN	/*  The maximum length of the base tag name */
+#define	MAX_OWNERSTRING_SZ	PNT_ENTITYNAME_SZ	/*  The maximum length of the owner string in a pre-pended tag name */
+#define	MAX_PREPENDEDTAGNAME_SZ	(MAX_OWNERSTRING_SZ+1+MAX_BASETAGNAME_SZ) /*  The maximum length of a base tagname prepended with the owner */
+#define	MAX_POINT_DESC_LEN	PRMDEF_LENGTH(PRDES)		/*  The maximum string length that can be stored in the point description */
+#define	MAX_GUID_STRING_SZ	36			/*  Maximum number of characters for a GUID in string format */
+
+/*   Character constants */
+
+#define	SYSPOINT_FIRSTCHAR	"$"		    /*  Reserved first character for sys points */
+
+/*   Delimiters */
+
+#define	TAGNAME_DELIM	":"		    /*  Delimiter for tag names */
+#define	FULLNAME_DELIM	"/"		    /*  Delimiter for fully qualified names */
+
+/*   Default search contexts to use when resolving a fully qualified name */
+
+#define	MAX_SEARCHCONTEXT_SZ	200
+#define	SEARCH_CONTEXT_DELIM	";"	
+#define	FULLNAME_SEARCH_CONTEXT	"/Assets"	
+
+/*   Offsets of the point structure header items (in words) */
+
+#define	PNT_TYP	3
+#define	PNT_SIZE	4
+#define	PNT_PARENTS	5
+#define	PNT_CHILDREN	7
+#define	PNT_ALMCOUNTS	9
+#define	PNT_BBARRAY	11
+#define	PNT_FULLALMCOUNT	13
+#define	PNT_GUID	37
+#define	PNT_GUID_SZ	16
+#define	PNT_SUBTYPE	45
+#define	PNT_ITEMNUMBER	46
+#define	PNT_FLAGS	47
+#define	PNT_OWNER	48
+#define	PNT_REMOTETYPE	49
+#define	PNT_ENTITYNAME	53
+
+/*   Sizes of the point structure header blocks (in words) */
+
+#define	PNTBLKSZ_STA	72
+#define	PNTBLKSZ_ANA	72
+#define	PNTBLKSZ_ACC	72
+#define	PNTBLKSZ_ACS	72
+#define	PNTBLKSZ_CDA	72
+#define	PNTBLKSZ_ASH	72
+
+
+/*   Definitions for the PNTALM access method */
+
+/*              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*             --------------------------------- */
+/*             |     |S|*|I|A|U|  pri  | subpri| */
+/*             --------------------------------- */
+
+#define	PNTALM_WORD	14
+#define	PNTALM_UNACKN_BIT	8
+#define	PNTALM_UNACKN_SZ	1
+#define	PNTALM_UNACKN_MASK	0x0100	
+#define	PNTALM_ACKED_BIT	9
+#define	PNTALM_ACKED_SZ	1
+#define	PNTALM_ACKED_MASK	0x0200	
+#define	PNTALM_ALMPRI_BIT	4
+#define	PNTALM_ALMPRI_SZ	4
+#define	PNTALM_ALMPRI_MASK	0x00F0	
+#define	PNTALM_ALMSUBPRI_BIT	0
+#define	PNTALM_ALMSUBPRI_SZ	4
+#define	PNTALM_ALMSUBPRI_MASK	0x000F	
+#define	PNTALM_INALM_BIT	10
+#define	PNTALM_INALM_SZ	1
+#define	PNTALM_INALM_MASK	0x0400	
+/*               Bit 11 reserved. Do not use. */
+#define	PNTALM_SHELVED_BIT	12
+#define	PNTALM_SHELVED_SZ	1
+#define	PNTALM_SHELVED_MASK	0x1000	
+
+/*   Point flags */
+
+#define	PNTFLG_AREAENABLED_BIT	0
+#define	PNTFLG_AREAENABLED_SZ	1
+#define	PNTFLG_AREAENABLED_MASK	0x0001	
+#define	PNTFLG_REDUNDANT_BIT	3
+#define	PNTFLG_REDUNDANT_SZ	1
+#define	PNTFLG_REDUNDANT_MASK	0x0008	
+#define	PNTFLG_REDUNDANTBACKUP_BIT	4
+#define	PNTFLG_REDUNDANTBACKUP_SZ	1
+#define	PNTFLG_REDUNDANTBACKUP_MASK	0x0010	
+
+/*   System Entity point sub-types */
+
+/*     see def/parameters */
+
+
+/*   Model types */
+
+#define	MDL_ASSETS	1
+#define	MDL_ALARMGROUPS	2
+#define	MDL_SYSTEM	3
+#define	MDL_CANE	4
+
+/*   Point relationship direction values */
+
+#define	PNTRELDIR_INVALID	0
+#define	PNTRELDIR_PARENT	1
+#define	PNTRELDIR_CHILD	2
+
+/*   Meaning of the item number for Console Station Client points */
+
+#define	CSTNCLT_ITEMNUM_CONSTNNUM_BIT	8
+#define	CSTNCLT_ITEMNUM_CONSTNNUM_SZ	8
+#define	CSTNCLT_ITEMNUM_CONSTNNUM_MASK	0xFF00	
+#define	CSTNCLT_ITEMNUM_CLIENTNUM_BIT	0
+#define	CSTNCLT_ITEMNUM_CLIENTNUM_SZ	8
+#define	CSTNCLT_ITEMNUM_CLIENTNUM_MASK	0x00FF	
+
+
+/*   SYS point status states */
+
+#define	SYSPNT_STATUS_GOOD	5
+#define	SYSPNT_STATUS_MARG	4
+#define	SYSPNT_STATUS_FAIL	3
+#define	SYSPNT_STATUS_DISABLED	2
+#define	SYSPNT_STATUS_NONE	1
+#define	SYSPNT_STATUS_UNKNOWN	0
+
+
+/*   CDA point subtype for Unknown HW Device */
+
+#define	CDAUNKNOWNDEVICE	14
+
+
+/*   HSC_PARAM_RANGE_EX FLAGS */
+
+#define	PARAM_RANGELIMITS_NOFLAGS	0x00000	
+#define	PARAM_RANGELIMITS_DEVICE	0x00001	
+
+#endif	

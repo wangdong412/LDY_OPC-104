@@ -1,0 +1,326 @@
+
+/*                             OPERID - operator id table */
+/*                             -------------------------- */
+#if	!defined( OIDNAM )
+
+/*     SCCS REVISION: */
+/*         @(#)operid_def,v	830.1 */
+
+/*     FUNCTION: */
+/*         To define an operator and his access to the system. */
+
+#include	"src/cmdtbl_def"
+#include	"src/crttbl_def"
+#include	"src/gdatbl_def"
+
+
+/*       integer*2  OIDSZ, LEGACY_OIDSZ, MAPSZ, OIDMOP */
+/*       integer*2  IDSZ, GRPIDSZ, PSWSZ, MAX_PSWSZ, DESCSZ */
+/*       integer*2  OIDISZ, OIDGSZ, OIDPSZ, OIDDSZ, OIDSPGSZ */
+/*       integer*2  OUSZ			    ;* size of operator's Windows Domain Organisational Unit (chars) */
+/*       integer*2  OIDOUSZ			;* size of operator's Windows Domain Organisational Unit (int2s) */
+/*       integer*2  DOMAINSZ			;* size of windows domain (chars) */
+/*       integer*2  OIDDMNSZ			;* size of Windows domain (int2s) */
+/*       integer*2  FULLIDSZ */
+/*       integer*2  OIDFULLIDSZ */
+/*       integer*2  FORMATTED_OPERID_SZ          ;* size of combined OperID and Full Name and Station Name (CSTNxx-y) + 5 DELIMITERS (chars) */
+/*       integer*2  FORMATTED_OPERID_DSA_SZ       ;* size of OIDFORMATTEDIDSZ + Remote Server Alias (GDANAMSZ) + Release version */
+/*                                             "R770" and 2 special delimiter (chars) */
+/*       integer*2  OIDTIMSZ, OIDSTASZ, OIDCSTASZ */
+#define	MAPSZ	1024/16		   /*  size of assignment maps */
+#define	PSWSZ	6			   /*  size of stored password (legacy) */
+#define	MAX_PSWSZ	40		   /*  maximum size of password (legacy) */
+#define	OIDMOP	10			   /*  maximum old passwords in list (legacy) */
+#define	OIDSPGSZ	40			   /*  size of startup page */
+#define	IDSZ	20			   /*  maximum size of operator id (chars) */
+#define	GRPIDSZ	32	             /*  maximum size of group id (chars) */
+#define	LEGACY_OIDSZ	4		   /*  maximum size of legacy operator id for pre-R500 systems (chars) */
+#define	DESCSZ	50			   /*  operator description size (chars) */
+#define	OUSZ	80	                /*  maximum size of Windows Domain Organisational Unit (chars) */
+#define	DOMAINSZ	16	           /*  maximum size of windows domain (chars) */
+#define	FULLIDSZ	50		           /*  maximum size of combined id and domain (chars) */
+#define	OIDPSZ	PSWSZ/2		   /*  number of words for pswrd (legacy) */
+#define	OIDISZ	IDSZ/2		   /*  number of words for operator id */
+#define	OIDGSZ	GRPIDSZ/2		   /*  number of words for group id */
+#define	OIDDSZ	DESCSZ/2	        /*  number of words for operator's full name */
+#define	OIDOUSZ	OUSZ/2	         /*  number of words for Organisational unit */
+#define	OIDDMNSZ	DOMAINSZ/2	    /*  number of words for operator's domain */
+#define	OIDFULLIDSZ	FULLIDSZ/2	 /*  maximum size of combined id and domain (int2s) */
+
+#define	FORMATTED_OPERID_SZ	MAX_STN_NAME_SZ + FULLIDSZ + DESCSZ + 5	
+#define	FORMATTED_OPERID_DSA_SZ	FORMATTED_OPERID_SZ + GDANAMSZ + 7	
+#define	OIDTIMSZ	2	             /*  size of a time entry */
+#define	OIDSTASZ	8	             /*  size of station enable map for Flex Stations */
+#define	OIDCSTASZ	6	             /*  size of station enable map for Console Stations */
+
+#define	OIDSZ	(400 + MAPSZ + (CMDTBLNM*MAPSZ))	
+
+
+/*                                   5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                                  --------------------------------- */
+/*                              1-2 ! Spare ~~~~~~~~~~~~~ 2 words   ! */
+/*                                  --------------------------------- */
+/*                              3-5 ! operator password (6 char)    ! */
+/*       integer*2  OIDSEC      ;*    --------------------------------- */
+#define	OIDSEC	6	 /*   6 !F!E!D!C!   B   !       A       ! */
+/*                                  --------------------------------- */
+/*                                       A - operator control security level (8 bits) */
+/*                                       B - operator station security level (4 bits) */
+/*                                       C - Card Management System only access */
+/*                                       D - Windows account, 0=No, 1=Yes */
+/*                                       E - Account disabled, 0=No, 1=Yes */
+/*                                       F - multi-user profile */
+/*       integer*2  OIDLVL_WINACCOUNT, OIDLVL_MULTIUSER */
+#define	OIDLVL_MULTIUSER	0x8000		
+#define	OIDLVL_WINACCOUNT	0x2000		
+
+/*       integer*2  OIDSEC2      ;*   --------------------------------- */
+#define	OIDSEC2	7	 /*  7 !                     !E!D!C!B!A! */
+/*                                  --------------------------------- */
+/*                                       A - Account/group is valid, 0=No, 1=Yes */
+/*                                       B - Reset account/group to default values, 1=do it */
+/*                                       C - Include group permissions for this operator, 0=No, 1=Yes */
+/*                                       D - This operator is actually a group, 0=No, 1=Yes */
+/*                                       E - Password for this operator does not expire (Traditional Opers only) */
+/*       integer*2  OIDWIN_ACCGRP_VALID, OIDWIN_ACCGRP_RESET, OIDWIN_INCGROUP, OIDWIN_ISGROUP */
+/*       integer*2  OIDPWD_NOEXPIRE */
+#define	OIDWIN_ACCGRP_VALID	0x0001		
+#define	OIDWIN_ACCGRP_RESET	0x0002		
+#define	OIDWIN_INCGROUP	0x0004		
+#define	OIDWIN_ISGROUP	0x0008		
+#define	OIDPWD_NOEXPIRE	0x0010		
+
+/*                                  --------------------------------- */
+/*                             8-15 ! Flex Station Access Map       ! */
+/*                                  --------------------------------- */
+/*                            16-21 ! Console Station Access Map    ! */
+/*                                  --------------------------------- */
+/*                               22 ! inhibit message printouts     ! */
+/*                                  --------------------------------- */
+/*                                        bit 0 - inhibit ALL message printout */
+/*                                        bit n - inhibit priority n */
+/*                                                (refer PRTQUE_DEF) */
+/*       integer*2  OIAREA       ;*   --------------------------------- */
+#define	OIAREA	23	 /* 23 ! reserved for Area Code        ! */
+/*       integer*2  OIDDATE      ;*   --------------------------------- */
+#define	OIDDATE	24	/* 24 ! Date of last password change  ! */
+/*                                  --------------------------------- */
+/*                            25-27 ! old password 1                ! */
+/*                                  --------------------------------- */
+/*                            28-30 ! old password 2                ! */
+/*                                  --------------------------------- */
+/*                            31-33 ! old password 3                ! */
+/*                                  --------------------------------- */
+/*                            34-36 ! old password 4                ! */
+/*                                  --------------------------------- */
+/*                            37-39 ! old password 5                ! */
+/*                                  --------------------------------- */
+/*                            40-42 ! old password 6                ! */
+/*                                  --------------------------------- */
+/*                            43-45 ! old password 7                ! */
+/*                                  --------------------------------- */
+/*                            46-48 ! old password 8                ! */
+/*                                  --------------------------------- */
+/*                            49-51 ! old password 9                ! */
+/*                                  --------------------------------- */
+/*                            52-54 ! old password 10               ! */
+/*                                  --------------------------------- */
+/*                            55-64 ! old password change dates     ! */
+/*                                  --------------------------------- */
+/*                            65-79 ! Operator job title 30 chars   ! */
+/*                                  --------------------------------- */
+/*                               80 ! Day Enable Map                ! */
+/*                                  --------------------------------- */
+/*                                          bit 0 = Sun */
+/*                                          bit 1 = Mon */
+/*                                              ..... */
+/*                                          bit 6 = Sat */
+/*                                          bit 7 = Holiday */
+/*                                  --------------------------------- */
+/*                               81 ! Sunday Start Time    (real)   ! */
+/*                                  --------------------------------- */
+/*                               83 ! Monday Start Time             ! */
+/*                                  --------------------------------- */
+/*                                  ! ...... ..... ....             ! */
+/*                                  --------------------------------- */
+/*                               93 ! Saturday Start Time           ! */
+/*                                  --------------------------------- */
+/*                               95 ! Holiday Start Time            ! */
+/*                                  --------------------------------- */
+/*                               97 ! Sunday Finish Time   (real)   ! */
+/*                                  --------------------------------- */
+/*                               99 ! Monday Finish Time            ! */
+/*                                  --------------------------------- */
+/*                                  ! ...... ...... ....            ! */
+/*                                  --------------------------------- */
+/*                              109 ! Saturday Finish Time          ! */
+/*                                  --------------------------------- */
+/*                              111 ! Holiday Finish Time           ! */
+/*                                  --------------------------------- */
+/*                          113-115 ! Spare ~~~~~~~~~~~~~  3 words  ! */
+/*                                  --------------------------------- */
+/*                              116 ! Session setting enable bits   ! */
+/*                                  --------------------------------- */
+/*                                          bit 0 = Idle timeout */
+/*                                          bit 1 = Start up page */
+/*       integer*2  OIDSES_IDLETMT, OIDSES_STRTPAGE */
+#define	OIDSES_IDLETMT	0x0001		
+#define	OIDSES_STRTPAGE	0x0002		
+
+/*                                  --------------------------------- */
+/*                         117      ! Idle timeout value            ! */
+/*       integer*2  OIDAAP         ;* --------------------------------- */
+#define	OIDAAP	118	  /*  ! Area Profile record no.       ! */
+/*       integer*2  OIDTEMAVIS     ;* --------------------------------- */
+#define	OIDTEMAVIS	119	/*  TEMA Visibility (20 chars)    ! */
+/*       integer*2  OIDTEMAPRO     ;* --------------------------------- */
+#define	OIDTEMAPRO	129	/*  TEMA Profile (16 chars)       ! */
+/*       integer*2  OIDTEMAVISSZ, OIDTEMAPROSZ */
+#define	OIDTEMAVISSZ	20	
+#define	OIDTEMAPROSZ	16	
+/*       integer*2  OIDDMN ;*         --------------------------------- */
+#define	OIDDMN	137	 /* 137 ! Win Domain (NetBios)(16 char) ! */
+/*                                  --------------------------------- */
+/*                          145-148 ! Spare ~~~~~~~~~~~~~   4 words ! */
+/*                                  --------------------------------- */
+/*       integer*2  OIDIRIMS ;*149-152! IRIMS Password 8 chars        ! */
+#define	OIDIRIMS	149	 /*   --------------------------------- */
+/*       integer*2  OIDIRIMSSZ */
+#define	OIDIRIMSSZ	8	
+/*       integer*2  OIDSPGX      ;*   --------------------------------- */
+#define	OIDSPGX	153	 /*    ! Start up page name  (40 char) ! */
+/*                                  ! (same as sysflg_def)          ! */
+/*       integer*2  OIDNAM      ;*    --------------------------------- */
+#define	OIDNAM	173	 /* 173 ! Windows account     (32 char) ! */
+/*       integer*2  OIDFGID  ;*       --------------------------------- */
+#define	OIDFGID	189	/* 189 ! Full Group ID       (50 char) ! */
+/*                                  --------------------------------- */
+/*                          214-222 ! Spare                9 words  ! */
+/*       integer*2  OIDDESC ;*        --------------------------------- */
+#define	OIDDESC	223	/* 223 ! Windows Full Name   (50 char) ! */
+/*       integer*2  OIDFID ;*         --------------------------------- */
+#define	OIDFID	248	 /* 248 ! Full Oper ID        (50 char) ! */
+/*                                  --------------------------------- */
+
+/*       integer*2  OIDAPM         ;* --------------------------------- */
+#define	OIDAPM	273	  /*  ! Area permission map           ! */
+/*                                  ! (1024 x 2 bits)               ! */
+/*       integer*2  OIDAAM         ;* --------------------------------- */
+#define	OIDAAM	401	  /*  ! Area assignment map           ! */
+/*                                  ! (1024 bits)                   ! */
+/*       integer*2  OIDCSM          ;* --------------------------------- */
+#define	OIDCSM	465	  /*  ! Command 1 segregation map     ! */
+/*                                  ! (1024 bits)                   ! */
+/*                                  --------------------------------- */
+/*                         529      ! Command 2 segregation map     ! */
+/*                                  ! (1024 bits)                   ! */
+/*                                  --------------------------------- */
+/*                         ???      ! ....... . ........... ...     ! */
+/*                                  ! (1024 bits)                   ! */
+/*                                  --------------------------------- */
+/*                         ???      ! Command n segregation map     ! */
+/*                                  ! (1024 bits)                   ! */
+/*                                  --------------------------------- */
+/*			  401 + MAPSZ + MAPSZ*CMDTBLNM */
+
+
+/*       integer*2  OIDBUF(OIDSZ) */
+
+/*       integer*2  OIDPSW(OIDPSZ)		;* operator password (6 char) (legacy) */
+/*       integer*2  OIDLVL			;* operator security and control level */
+/*       integer*2  OIDWIN			;* operator security windows values */
+/*       integer*2  OIDSMP(OIDSTASZ)	;* signon station access map (Flex Stations) */
+/* 	  integer*2  OIDCSMP(OIDCSTASZ)	;* signon station access map (Console Stations) */
+/*       integer*2  OIDPIN			;* inhibit printouts */
+/*       integer*2  OIDACD			;* reserved for Area Code */
+/*       integer*2  OIDPCT			;* Date of last password change (legacy) */
+/*       integer*2  OIDOPW(OIDPSZ,OIDMOP)	;* old passwords (legacy) */
+/*       integer*2  OIDOPD(OIDMOP)		;* old password change dates (legacy) */
+/*       integer*2  OIDJOB(15)		;* operator job descrptor (30 chars) */
+/*       integer*2  OIDDAY			;* signon day enable map */
+/*       integer*2  OIDSRT(OIDTIMSZ, 8)	;* signon start time */
+/*       integer*2  OIDFSH(OIDTIMSZ, 8)	;* signon finish time */
+/*       integer*2  OIDSES			;* operator session setting enable bits */
+/*       integer*2  OIDITO			;* operator idle timeout duration */
+/*       integer*2  OIDDOMAIN(OIDDMNSZ)	;* windows domain name (16 chars) */
+/*       integer*2  OIDSPG(OIDSPGSZ/2)	;* operator start up page name */
+/*       integer*2  OID(OIDISZ)		;* operator id (20 char) */
+/*       integer*2  OIDFULLGID(OIDFULLIDSZ);* Full group ID (50 chars) */
+/*       integer*2  OIDDES(OIDDSZ)		;* operator descrptor (50 chars) */
+/*       integer*2  OIDFULLID(OIDFULLIDSZ)	;* full operator id, incorporating oid and oiddomain */
+/*       integer*2  OIDAPMAP(MAPSZ*2)	;* Area permission map */
+/*       integer*2  OIDAAMAP(MAPSZ)	;* Area assignment map */
+/*       integer*2  OIDCSG(MAPSZ,CMDTBLNM)	;* Command segregation map */
+
+/*       equivalence (OIDBUF( 3) , OIDPSW) */
+/*       equivalence (OIDBUF(OIDSEC) , OIDLVL) */
+/*       equivalence (OIDBUF(OIDSEC2) , OIDWIN) */
+/*       equivalence (OIDBUF( 8) , OIDSMP) */
+/*       equivalence (OIDBUF(16) , OIDCSMP) */
+/*       equivalence (OIDBUF(22) , OIDPIN) */
+/*       equivalence (OIDBUF(23) , OIDACD) */
+/*       equivalence (OIDBUF(24) , OIDPCT) */
+/*       equivalence (OIDBUF(25) , OIDOPW) */
+/*       equivalence (OIDBUF(55) , OIDOPD) */
+/*       equivalence (OIDBUF(65) , OIDJOB) */
+/*       equivalence (OIDBUF(80) , OIDDAY) */
+/*       equivalence (OIDBUF(81) , OIDSRT) */
+/*       equivalence (OIDBUF(97) , OIDFSH) */
+/*       equivalence (OIDBUF(116) , OIDSES) */
+/*       equivalence (OIDBUF(117) , OIDITO) */
+/*       equivalence (OIDBUF(OIDDMN) , OIDDOMAIN) */
+/*       equivalence (OIDBUF(OIDSPGX), OIDSPG) */
+/*       equivalence (OIDBUF(OIDNAM) , OID) */
+/*       equivalence (OIDBUF(OIDFGID), OIDFULLGID) */
+/*       equivalence (OIDBUF(OIDDESC), OIDDES) */
+/*       equivalence (OIDBUF(OIDFID) , OIDFULLID) */
+/*       equivalence (OIDBUF(OIDAPM) , OIDAPMAP) */
+/*       equivalence (OIDBUF(OIDAAM) , OIDAAMAP) */
+/*       equivalence (OIDBUF(OIDCSM) , OIDCSG) */
+
+
+
+
+
+
+struct    operid
+    {
+    int2  spare1[3-1];        /* spare (2 words)                            */
+    int2  oidpsw[OIDPSZ];     /* operator password (3 words) (legacy)       */
+    int2  oidlvl;             /* operator security level                    */
+    int2  oidwin;             /* operator windows settings                  */
+    int2  oidsmp[OIDSTASZ];   /* signon station access map                  */
+    int2  oidcsmp[OIDCSTASZ];  /* console station access map              */
+    int2  oidpin;             /* printer inhibit flags                      */
+    int2  oidacd;             /* area code                                  */
+    int2  oidpct;             /* password change date (legacy)              */
+    int2  oidopw[OIDMOP][OIDPSZ];/* old passwords (legacy)                  */
+    int2  oidopd[OIDMOP];     /* old password change dates (legacy)         */
+    int2  oidjob[15];         /* operator job description                   */
+    int2  oidday;	        /* signon day enable map                          */
+    int2  oidsrt[8][OIDTIMSZ];/* signon start time                          */
+    int2  oidfsh[8][OIDTIMSZ];/* signon finish time                         */
+    int2  spare113[3];        /* spare (3 words)                            */
+    int2  oidses;             /* operator session setting enable bits       */
+    int2  oidito;             /* operator idle timeout duration             */
+    int2  oidaap;             /* operator area profile record               */
+    int2  oidtemavis[OIDTEMAVISSZ/2]; /* operator TEMA visibility name      */
+    int2  oidtemapro[OIDTEMAPROSZ/2]; /* operator TEMA profile name         */
+    int2  oiddomain[OIDDMNSZ];/* operator's domain name                     */
+    int2  spare145[149-145];	/* spare (4 words)                            */
+    int2  oidirims[OIDIRIMSSZ/2];/* IRIMS Password                          */
+    int2  oidspg[OIDSPGSZ/2]; /* operator start up page name                */
+    int2  oid[OIDGSZ];        /* operator's windows account name            */
+    int2  oidfullgid[OIDFULLIDSZ];/* group's combined username and domain   */
+    int2  spare214[223-214];  /* spare (9 words)                           */
+    int2  oiddes[OIDDSZ];     /* operator's full windows name               */
+    int2  oidfullid[OIDFULLIDSZ]; /* operator's combined username and domain*/
+    int2  oidapm[MAPSZ*2];    /* area permission map                        */
+    int2  oidasg[MAPSZ];      /* area segregation map                       */
+    int2  oidcsg[CMDTBLNM][MAPSZ];/* command segregation map                */
+    };
+
+
+
+#endif	
+
