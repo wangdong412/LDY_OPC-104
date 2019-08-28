@@ -1,6 +1,0 @@
-; hw104_PKSCollector.def : Declares the module parameters for the DLL.
-
-LIBRARY      "hw104_PKSCollector"
-
-EXPORTS
-    ; Explicit exports can go here
