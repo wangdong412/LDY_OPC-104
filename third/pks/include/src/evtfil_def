@@ -1,0 +1,746 @@
+#if	!defined(ALMEVTSZ)
+
+
+/*                             EVTFIL - event file */
+/*                             ------------------- */
+
+/*     REVISION: */
+/*         @(#)evtfil_def,v	830.1.1.13 */
+
+/*     NOTE: */
+/*	  Remember to edit PRTQUE_DEF if you change the message */
+/*	  This file contains two sets of the definitions. One to generate alarms using the pre-770 style,ie by filling out */
+/*	  EVFMSG buffer. This method does not support the flexible attributes. The other definition are for the 770++ alarm file */
+/*         event file and print queue structures. */
+
+
+
+/*     DEPENDENCIES: */
+
+#include	"src/cattbl_def"
+#include	"src/lnktyp_def"
+
+#define	EVFPSZ	132	/*  Max length of printed event */
+#define	ALMEVTSZ	1360	/*  must be multiple of 4 */
+#define	ALMEVTDEFMAP_SZ	CATDEFMAPSZ /*  in words */
+
+#if	!defined( inside_IDL )
+
+#include	"src/hsctypes_def"
+
+#include "hsctypes.h"
+
+
+#endif	
+
+
+
+
+/*----------------------------------------------------------------------------------------------------------------------------- */
+/* Event structure */
+/*----------------------------------------------------------------------------------------------------------------------------- */
+
+/*   Strings - size must be even, size in chars */
+
+#define	ALMEVTSRC_SZ	40
+#define	ALMEVTCON_SZ	30
+#define	ALMEVTACT_SZ	8
+#define	ALMEVTACTOR_SZ	50
+#define	ALMEVTDES_SZ	132
+#define	ALMEVTUNT_SZ	12
+#define	ALMEVTHLD1ST_SZ	50
+#define	ALMEVTHLDLAST_SZ	50
+#define	ALMEVTACCRSN_SZ	20
+#define	ALMEVTREASON_SZ	60
+#define	ALMEVTAST_SZ	40
+#define	ALMEVTLINK_SZ	128
+#define	ALMEVTCOMMENT_SZ	50
+#define	ALMEVTSTN_SZ	30
+#define	ALMEVTSIGMEAN_SZ	24
+#define	ALMEVTGDASN_SZ	20
+#define	ALMEVTFLEX_SZ	24
+#define	ALMEVTVAL_SZ	ALMEVTFLEX_SZ
+#define	ALMEVTSRCENTITYNAME_SZ	40
+#define	ALMEVTLOCTAGNAME_SZ	40
+#define	ALMEVTLOCFULLNAME_SZ	200
+#define	ALMEVTCLASS_SZ	20
+#define	ALMEVTEBIRESERVED_SZ	116
+#define	ALMEVTSHLVREASON_SZ	30
+#define	ALMEVTBLOCK_SZ	30
+
+#if	!defined( inside_IDL )
+
+
+/*   Other */
+
+#define	ALMEVTFLEXCOUNT	40   /*  number of flexible attributes */
+#define	ALMEVTDEFMAPCOUNT	(ALMEVTDEFMAP_SZ*16) /*  number of attributes in atttribute def map */
+
+/*   OPC QUALITY MASKS - these are replicated from opcaedef.h so they can be used in FORTRAN, the names have been shortened to keep the sep happy. */
+
+/*     Masks for extracting quality subfields */
+/*     (note 'status' mask also includes 'Quality' bits) */
+
+#define	EVTOPC_QUAL_MASK	0x00C0	
+#define	EVTOPC_STATUS_MASK	0x00FC	
+#define	EVTOPC_LIMIT_MASK	0x0003	
+
+/*     Values for QUALITY_MASK bit field */
+
+#define	EVTOPC_QUAL_BAD	0x0000	
+#define	EVTOPC_QUAL_GOOD	0x00C0	
+#define	EVTOPC_QUAL_UNCERTAIN	0x0040	
+
+/*     STATUS_MASK Values for Quality = BAD */
+
+#define	EVTOPC_QUAL_CONFIG_ERROR	0x0004	
+#define	EVTOPC_QUAL_NOT_CONNECTED	0x0008	
+#define	EVTOPC_QUAL_DEVICE_FAILURE	0x000c	
+#define	EVTOPC_QUAL_SENSOR_FAILURE	0x0010	
+#define	EVTOPC_QUAL_LAST_KNOWN	0x0014	
+#define	EVTOPC_QUAL_COMM_FAILURE	0x0018	
+#define	EVTOPC_QUAL_OUT_OF_SERVICE	0x001C	
+
+/*     STATUS_MASK Values for Quality = UNCERTAIN */
+
+#define	EVTOPC_QUAL_LAST_USABLE	0x0044	
+#define	EVTOPC_QUAL_SENSOR_CAL	0x0050	
+#define	EVTOPC_QUAL_EGU_EXCEEDED	0x0054	
+#define	EVTOPC_QUAL_SUB_NORMAL	0x0058	
+
+/*     STATUS_MASK Values for Quality = GOOD */
+
+#define	EVTOPC_QUAL_LOCAL_OVERRIDE	0x00D8	
+
+
+/*     Values for alert accessibility */
+
+#define	ALERTACCESS_PUBLIC	0x0000	
+#define	ALERTACCESS_PRIVATE	0x0001	
+
+/*   External Attribute Layout */
+
+/*   Indexes should not be reused for DSA backward compatibility */
+
+#define	ALMEVTALLIDXS	0
+#define	ALMEVTMINIDX	1
+#define	ALMEVTTIMEIDX	1
+#define	ALMEVTETIMEIDX	2
+#define	ALMEVTQUALIDX	3
+#define	ALMEVTSEVIDX	4
+#define	ALMEVTACDIDX	5
+#define	ALMEVTPRIIDX	6
+#define	ALMEVTHLD_IDIDX	7
+#define	ALMEVTCATIDX	8
+#define	ALMEVTPREVVALIDX	9
+#define	ALMEVTCONNECTIDX	10
+#define	ALMEVTCHANGETIMEIDX	11
+#define	ALMEVTVALIDX	12
+#define	ALMEVTCOMMENTIDX	13  /*  Do not reuse DSA compatibility */
+#define	ALMEVTSRCIDX	14
+#define	ALMEVTDESIDX	15
+#define	ALMEVTACTORIDX	16
+#define	ALMEVTHLD1STIDX	17
+#define	ALMEVTHLDLASTIDX	18
+#define	ALMEVTCONIDX	19
+#define	ALMEVTSUBCONIDX	20
+#define	ALMEVTACTIDX	21
+#define	ALMEVTUNTIDX	22
+#define	ALMEVTACCRSNIDX	23
+#define	ALMEVTASTIDX	24
+#define	ALMEVTSTNIDX	25
+#define	ALMEVTLINK1IDX	26
+#define	ALMEVTLINK2IDX	27
+#define	ALMEVTLINK3IDX	28
+#define	ALMEVTLIMIDX	29
+#define	ALMEVTFLAGSIDX	30
+#define	ALMEVTCRDNUMIDX	31
+#define	ALMEVTIDIDX	32
+#define	ALMEVTLINK1TYPEIDX	33
+#define	ALMEVTLINK2TYPEIDX	34
+#define	ALMEVTLINK3TYPEIDX	35
+#define	ALMEVTREASONIDX	36
+#define	ALMEVTSIGMEANIDX	37
+#define	ALMEVTSIGMEAN2IDX	38
+#define	ALMEVTSIG2LEVELIDX	39
+#define	ALMEVTTIMEBIASIDX	40
+#define	ALMEVTFIELDBIASIDX	41
+#define	ALMEVTPREVVALTYPEIDX	42
+#define	ALMEVTVALTYPEIDX	43
+#define	ALMEVTTRANSIDIDX	44
+#define	ALMEVTPARIDX	45
+#define	ALMEVTALERTACCESSIDX	46
+#define	ALMEVTAUTHORIDX	47
+#define	ALMEVTDAITEMIDX	48
+#define	ALMEVTSRCENTITYNAMEIDX	49
+#define	ALMEVTLOCTAGNAMEIDX	50
+#define	ALMEVTLOCFULLNAMEIDX	51
+#define	ALMEVTCLASSIDX	52
+#define	ALMEVTORGCONNECTIDX	53
+#define	ALMEVTSRCTAGNAMEIDX	54
+#define	ALMEVTSEQIDIDX	55
+#define	ALMEVTEEINITIDIDX	56
+#define	ALMEVTEXEIDIDX	57
+#define	ALMEVTIOLIMEEIDX	58
+/*  Indices 59-64 are used in 840 for new cardholder fields */
+#define	ALMEVTSHLVREASONIDX	65
+#define	ALMEVTRECEIVEDDELAYIDX	66
+#define	ALMEVTJOURNALONLYIDX	67
+#define	ALMEVTBLOCKIDX	68
+#define	ALMEVTSHELVEDIDX	69
+
+/*  If you add a new field into the event, make sure you also update the FillInOnEventStruct() routine in hscopcservobject.cpp module */
+/*  Otherwise, OPC AE Server will not publish this via OPC */
+
+#define	ALMEVTFLEXBASEIDX	100  /* SPARE INDEXES FROM 69 TO 99 */
+#define	ALMEVT770FLEXBASEIDX	31  /* FLEXBASE IN LAST SCHEMA VERSION,USED BY DSA */
+#define	ALMEVT780FLEXBASEIDX	44  /* FLEXBASE IN LAST SCHEMA VERSION,USED BY DSA */
+#define	ALMEVT800FLEXBASEIDX	49  /* FLEXBASE IN LAST SCHEMA VERSION,USED BY DSA */
+#define	ALMEVT810FLEXBASEIDX	55  /* FLEXBASE IN LAST SCHEMA VERSION,USED BY DSA */
+#define	ALMEVTMAXIDX	(ALMEVTFLEXBASEIDX+ALMEVTFLEXCOUNT-1) /*  Maximum index */
+
+
+/*   Internal Attribute Layout */
+
+/*   Note: */
+/*     - Internal attributes are for internal use only, hence, do not use these */
+/*       attributes to set an alm/evt's attribute definition map. */
+/*     - External and internal attributes should not be overlapped. */
+
+#define	ALMEVT_INIDX_START	1000
+#define	ALMEVT_INIDX_CHANGEDBIAS	1000
+#define	ALMEVT_INIDX_END	1001
+
+
+#define	ALMEVTXTIME	1
+#define	ALMEVTXETIME	5
+#define	ALMEVTXBIAS	9
+#define	ALMEVTXEBIAS	10
+#define	ALMEVTXACD	11
+#define	ALMEVTXPRI	12
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                            !               !  pri  !sub pri! */
+/*                            --------------------------------- */
+/*       To set priority use PRQPRI_MASK, PRQPRI_OFFSET, PRQPRI_WIDTH	and */
+/*       for subpriority use PRQSUBPRI_MASK, PRQSUBPRI_WIDTH,PRQPRI_SIMPLE_MASK */
+
+#define	ALMEVTXHLD_ID	13
+#define	ALMEVTXCAT	15
+#define	ALMEVTXVALTYPE	17
+#define	ALMEVTXCONNECT	18		    /*  CONNECTION NUMBER */
+#define	ALMEVTXDEFMAP	19
+#define	ALMEVTXSEV	29		    /*  OPC severity */
+#define	ALMEVTXPREVVALTYPE	31
+#define	ALMEVTXQUAL	32
+#define	ALMEVTXCHANGEBIAS	33
+#define	ALMEVTXFLAGS	34	    /*  flag bits */
+#define	ALMEVTX_SHLVED	5       /*  Bit for identifying an event for a shelved alarm */
+#define	ALMEVTX_SHLVED_MASK	0x0020	 /*  or an alarm that has been shelved at some point in the past */
+#define	ALMEVTX_CR_GUARANTEED_DELIVERY	6       /*  Bit for identifying a recipe event is guaranteed */
+#define	ALMEVTX_CR_GUARANTEED_DELIVERY_MASK	0x0040	 /*  to be delivered and journaled into the event DB */
+#define	ALMEVTX_CR_RECOVERY_BRACKET	7       /*  Bit for identifying a recipe event recovery begin bracket event */
+#define	ALMEVTX_CR_RECOVERY_BRACKET_MASK	0x0080	 /*  */
+#define	ALMEVTX_CR_COMPLETE_EVT	8	      /*  Bit for identifying a control recipe complete event */
+#define	ALMEVTX_CR_COMPLETE_EVT_MASK	0x0100	 /*  */
+#define	ALMEVTX_VAR_ALARM_BIT	9	    /*  VARIABLE ALARM BIT EG. CDA ALARM */
+#define	ALMEVTX_AUTO_RTN_BIT	10	    /*  ALARM HAS NO RETURN TO NORMAL STATE */
+#define	ALMEVTX_ACK_REQD	11	    /*  ACK REQUIRED */
+#define	ALMEVTX_COMMENT_BIT	12	    /*  COMMENT ADDED BIT (note that this bit is not archived) */
+#define	ALMEVTX_COMMENT_MASK	0x1000	  /*  COMMENT ADDED MASK */
+#define	ALMEVTX_JNL_ONLY	13	    /*  JOURNAL ONLY BIT */
+#define	ALMEVTX_JNL_ONLY_MASK	0x2000	 /*  JOURNAL ONLY MASK */
+#define	ALMEVTX_CONT_CUT	14	    /*  CONTACT CUTOUT BIT */
+#define	ALMEVTX_CONT_CUT_MASK	0x4000	 /*  CONTACT CUTOUT MASK */
+#define	ALMEVTX_CSTN_JNL	15	    /*  Console Station Event should be Journalled on the Cluster Server */
+#define	ALMEVTX_CSTN_JNL_MASK	0x8000	 /*  Console Station Event should be Journalled on the Cluster Server MASK */
+#define	ALMEVTXLINK1TYPE	35
+#define	ALMEVTXLINK2TYPE	36
+#define	ALMEVTXLINK3TYPE	37
+#define	ALMEVTXSIG2LEVEL	38
+#define	ALMEVTXALERTACCESS	39
+#define	ALMEVTXIOLIMEE	40
+#define	ALMEVTXORGCONNECT	41	/*  ORIGINAL CONNECTION NUMBER */
+#define	ALMEVTXRECEIVEDDELAY	43	/*  must start on 4 byte boundary, ie x*2+1 millisecond difference between host time and server time */
+#define	ALMEVTXLIM	45	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXCHANGETIME	49	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXCRDNUM	53	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXID	57	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXTRANSID	61	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXSEQID	65	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXEEINITID	69	/*  must start on 8 byte boundary, ie x*4+1 EE Init ID */
+#define	ALMEVTXEXEID	73	/*  must start on 8 byte boundary, ie x*4+1 Execution ID */
+#define	ALMEVTXPREVVAL	77	/*  must start on 8 byte boundary, ie x*4+1 */
+#define	ALMEVTXVAL	(ALMEVTXPREVVAL + ALMEVTFLEX_SZ/2)				/*  89 */
+#define	ALMEVTXFLEXBASE	(ALMEVTXVAL + ALMEVTFLEX_SZ/2)				/*  101 */
+#define	ALMEVTXSRC	(ALMEVTXFLEXBASE + (ALMEVTFLEX_SZ/2)*ALMEVTFLEXCOUNT)		/*  581 */
+#define	ALMEVTXDES	(ALMEVTXSRC + ALMEVTSRC_SZ/2)					/*  601 */
+#define	ALMEVTXACTOR	(ALMEVTXDES + ALMEVTDES_SZ/2)				/*  667 */
+#define	ALMEVTXHLD1ST	(ALMEVTXACTOR + ALMEVTACTOR_SZ/2)				/*  692 */
+#define	ALMEVTXHLDLAST	(ALMEVTXHLD1ST + ALMEVTHLD1ST_SZ/2)			/*  717 */
+#define	ALMEVTXCON	(ALMEVTXHLDLAST + ALMEVTHLDLAST_SZ/2)				/*  742 */
+#define	ALMEVTXSUBCON	(ALMEVTXCON + ALMEVTCON_SZ/2)				/*  757 */
+#define	ALMEVTXACT	(ALMEVTXSUBCON + ALMEVTCON_SZ/2)				/*  772 */
+#define	ALMEVTXUNT	(ALMEVTXACT + ALMEVTACT_SZ/2)					/*  776 */
+#define	ALMEVTXACCRSN	(ALMEVTXUNT + ALMEVTUNT_SZ/2)				/*  782 */
+#define	ALMEVTXAST	(ALMEVTXACCRSN + ALMEVTACCRSN_SZ/2)				/*  792 */
+#define	ALMEVTXLINK	(ALMEVTXAST + ALMEVTAST_SZ/2)					/*  812 */
+#define	ALMEVTXCOMMENT	(ALMEVTXLINK + (ALMEVTLINK_SZ/2)*3)			/*  1004 */
+#define	ALMEVTXSTN	(ALMEVTXCOMMENT + ALMEVTCOMMENT_SZ/2)				/*  1029 */
+#define	ALMEVTXREASON	(ALMEVTXSTN + ALMEVTSTN_SZ/2)				/*  1044 */
+#define	ALMEVTXSIGMEAN	(ALMEVTXREASON + ALMEVTREASON_SZ/2)			/*  1074 */
+#define	ALMEVTXSIGMEAN2	(ALMEVTXSIGMEAN + ALMEVTSIGMEAN_SZ/2)			/*  1086 */
+#define	ALMEVTXAUTHOR	(ALMEVTXSIGMEAN2 + ALMEVTSIGMEAN_SZ/2)			/*  1098 */
+#define	ALMEVTXSRCENTITYNAME	(ALMEVTXAUTHOR + ALMEVTACTOR_SZ/2)			/*  1123 */
+#define	ALMEVTXLOCTAGNAME	(ALMEVTXSRCENTITYNAME + ALMEVTSRCENTITYNAME_SZ/2)	/*  1143 */
+#define	ALMEVTXLOCFULLNAME	(ALMEVTXLOCTAGNAME + ALMEVTLOCTAGNAME_SZ/2)		/*  1163 */
+#define	ALMEVTXCLASS	(ALMEVTXLOCFULLNAME + ALMEVTLOCFULLNAME_SZ/2)		/*  1263 */
+#define	ALMEVTXEBIRESERVED	(ALMEVTXCLASS + ALMEVTCLASS_SZ/2)			/*  1273 */
+#define	ALMEVTXSHLVREASON	(ALMEVTXEBIRESERVED + ALMEVTEBIRESERVED_SZ/2)		/*  1331 */
+#define	ALMEVTXBLOCK	(ALMEVTXSHLVREASON + ALMEVTSHLVREASON_SZ/2)			/*  1346 */
+#define	ALMEVTXSPARE	(ALMEVTXBLOCK + ALMEVTBLOCK_SZ/2)				/*  1361 */
+#define	ALMEVTSPARECOUNT	(ALMEVTSZ - (ALMEVTXSPARE)+1)				/*  0 */
+
+/*   define evtfil definition */
+
+
+
+/* 	type evtval */
+/* 	  sequence */
+/* 	  union */
+/* 	    map */
+/* 	      integer*2    int2 */
+/* 	    end map */
+/* 	    map */
+/* 	      integer*4    int4 */
+/* 	    end map */
+/*	    map */
+/*	      integer*8    int8 */
+/*	    end map */
+/* 	    map */
+/* 	      real*4       real */
+/* 	    end map */
+/* 	    map */
+/* 	      real*8       dble */
+/* 	    end map */
+/* 	    map */
+/* 	      character    text*(ALMEVTFLEX_SZ) */
+/* 	    end map */
+/* 	  end union */
+/* 	end type evtval */
+
+/* 	type almevtfil */
+/* 	  sequence */
+/* 	    type (HSCTIME) hosttime		;* host time */
+/* 	    type (HSCTIME) fieldtime		;* field time */
+/* 	    integer*2 hostbias			;* host time bias */
+/* 	    integer*2 fieldbias			;* field time bias */
+/* 	    integer*2 area			;* the event area */
+/* 	    integer*2 priority			;* priority and severity */
+/* 	    integer*4 holder_id			;* holder_id */
+/* 	    integer*4 category			;* category */
+/* 	    integer*2 valuetype			;* value type */
+/* 	    integer*2 GDAconnection		;* connection number */
+/* 	    integer*2 defmap(ALMEVTDEFMAP_SZ)	;* attribute definition map */
+/* 	    integer*4 severity			;* OPC severity */
+/* 	    integer*2 prevvaluetype		;* value type */
+/* 	    integer*2 quality			;* OPC quality */
+/* 	    integer*2 changedbias		;* last changed time bias */
+/* 	    integer*2 flags */
+/* 	    integer*2 link1type			;* link types */
+/* 	    integer*2 link2type */
+/* 	    integer*2 link3type */
+/* 	    integer*2 sig2_level		;* security level requred for 2nd signature */
+/* 	    integer*2 alertaccess		;* alert accessibility */
+/* 	    integer*2 iolimee */
+/*             integer*2 GDAorgconnection          ;* original connection number */
+/*             integer*2 spare1                    ;* spare */
+/*             integer*4 receiveddelay				;* difference in milliseconds between host time and current time */
+/* 	    double precision limit		;* alarm limit */
+/* 	    type (HSCTIME) changedtime		;* last changed time */
+/* 	    double precision cardnumber		;* card number */
+/* 	    integer*4 id(2)			;* Event ID */
+/* 	    integer*4 transid(2)		;* Transaction ID */
+/* 	    integer*4 seqid(2)		    ;* Sequence ID */
+/* 	    integer*4 EEinitid(2)		;* EE Init ID */
+/* 	    integer*4 exeid(2)			;* Execution ID */
+/* 	    type (evtval) prevvalue		;* previous value */
+/* 	    type (evtval) value			;* value */
+/* 	    type (evtval) flex(ALMEVTFLEXCOUNT)	;* flexible attributes */
+/* 	    character source*(ALMEVTSRC_SZ)		;* source  eg point name */
+/* 	    character desc*(ALMEVTDES_SZ)		;* description */
+/* 	    character actor*(ALMEVTACTOR_SZ)		;* actor eg operator */
+/* 	    character cardholder_1st*(ALMEVTHLD1ST_SZ)	;* card holder first name */
+/* 	    character cardholder_last*(ALMEVTHLDLAST_SZ)	;* card holder last name */
+/* 	    character condition*(ALMEVTCON_SZ)	;* condition */
+/* 	    character subcondition*(ALMEVTCON_SZ)	;* subcondition */
+/* 	    character action*(ALMEVTACT_SZ)		;* action */
+/* 	    character units*(ALMEVTUNT_SZ)		;* units */
+/* 	    character accessreason*(ALMEVTACCRSN_SZ)	;* accessreason */
+/* 	    character areaname*(ALMEVTAST_SZ)	;* area name */
+/* 	    character link1*(ALMEVTLINK_SZ)	;* link */
+/* 	    character link2*(ALMEVTLINK_SZ)	;* link */
+/* 	    character link3*(ALMEVTLINK_SZ)	;* link */
+/* 	    character comment*(ALMEVTCOMMENT_SZ)	;* comment */
+/* 	    character station*(ALMEVTSTN_SZ)	;* name of station */
+/* 	    character reason*(ALMEVTREASON_SZ)	;* reason */
+/* 	    character sig_meaning*(ALMEVTSIGMEAN_SZ)	;* signature meaning */
+/* 	    character sig_meaning2*(ALMEVTSIGMEAN_SZ)	;* second signature meaning (for C200 messages only) */
+/*             character author*(ALMEVTACTOR_SZ)		;* author */
+/*             character source_entityname*(ALMEVTSRCENTITYNAME_SZ) ;* source entity name */
+/*             character location_tagname*(ALMEVTLOCTAGNAME_SZ)     ;* location tag name (tagname of source's parent entity) */
+/*             character location_fullname*(ALMEVTLOCFULLNAME_SZ)   ;* location full name (fully qualified name) */
+/*             character classification*(ALMEVTCLASS_SZ)   ;* classification field for user alerts */
+/*             character ebireserved*(ALMEVTEBIRESERVED_SZ)  ;* reserved for ebi fields in 840 */
+/*             character shlvreason*(ALMEVTSHLVREASON_SZ)  ;* alarm shelving reason */
+/*             character block*(ALMEVTBLOCK_SZ)  ;* CEE function block name */
+/*	    integer*2 spare(ALMEVTSPARECOUNT)	;* spare */
+/* 	endtype almevtfil */
+
+#if	!defined(USE_DERIVED_TYPE)
+/*   Equivalences */
+/*       type (almevtfil) ALMEVTSTRUCT */
+/*       integer*2     ALMEVTBUF(ALMEVTSZ) */
+/*       integer*4     ALMEVTTIME(2), ALMEVTETIME(2) */
+/*       integer*2     ALMEVTBIAS, ALMEVTEBIAS */
+/*       integer*2     ALMEVTACD,  ALMEVTPRI, ALMEVTQUAL */
+/*       integer*4	    ALMEVTCAT, ALMEVTHLD_ID, ALMEVTSEV */
+/*       integer*2     ALMEVTDEFMAP(ALMEVTDEFMAP_SZ) */
+/*       integer*2     ALMEVTFLAGS */
+/*       integer*2     ALMEVTLINK1TYPE, ALMEVTLINK2TYPE, ALMEVTLINK3TYPE */
+/*       integer*2	    ALMEVTSIG2LEVEL */
+/*       character     ALMEVTSRC$*(ALMEVTSRC_SZ) */
+/*       character     ALMEVTCON$*(ALMEVTCON_SZ) */
+/*       character     ALMEVTSUBCON$*(ALMEVTCON_SZ) */
+/*       character     ALMEVTACT$*(ALMEVTACT_SZ) */
+/*       character     ALMEVTACTOR$*(ALMEVTACTOR_SZ) */
+/*       character     ALMEVTDES$*(ALMEVTDES_SZ) */
+/*       integer*2     ALMEVTVALTYPE */
+/*       integer*2     ALMEVTPREVVALTYPE */
+/*       character     ALMEVTUNT$*(ALMEVTUNT_SZ) */
+/*       character     ALMEVTACCRSN$*(ALMEVTACCRSN_SZ) */
+/*       character	    ALMEVTAST$*(ALMEVTAST_SZ) */
+/*       integer*2     ALMEVTFLEX((ALMEVTFLEX_SZ/2)*ALMEVTFLEXCOUNT) */
+/*       integer*2     ALMEVTVAL(ALMEVTFLEX_SZ/2) */
+/*       integer*2     ALMEVTPREVVAL(ALMEVTFLEX_SZ/2) */
+/*       character     ALMEVTVAL$*(ALMEVTFLEX_SZ) */
+/*       character     ALMEVTPREVVAL$*(ALMEVTFLEX_SZ) */
+/*       character     ALMEVTHLD1ST$*(ALMEVTHLD1ST_SZ) */
+/*       character     ALMEVTHLDLAST$*(ALMEVTHLDLAST_SZ) */
+/*       character     ALMEVTSTN$*(ALMEVTSTN_SZ) */
+/*       character     ALMEVTREASON$*(ALMEVTREASON_SZ) */
+/*       character     ALMEVTSIGMEAN$*(ALMEVTSIGMEAN_SZ) */
+/*       character     ALMEVTSIGMEAN2$*(ALMEVTSIGMEAN_SZ) */
+/*       character     ALMEVTLINK1$*(ALMEVTLINK_SZ) */
+/*       character     ALMEVTLINK2$*(ALMEVTLINK_SZ) */
+/*       character     ALMEVTLINK3$*(ALMEVTLINK_SZ) */
+/*       double precision ALMEVTLIM */
+/*       double precision ALMEVTCRDNUM */
+/*       integer*4     ALMEVTID(2) */
+/*       integer*4     ALMEVTTRANSID(2) */
+/*       integer*2     ALMEVTALERTACCESS */
+/*       character     ALMEVTAUTHOR$*(ALMEVTACTOR_SZ) */
+/*       character     ALMEVTSRCENTITYNAME$*(ALMEVTSRCENTITYNAME_SZ) */
+/*       character     ALMEVTLOCTAGNAME$*(ALMEVTLOCTAGNAME_SZ) */
+/*       character     ALMEVTLOCFULLNAME$*(ALMEVTLOCFULLNAME_SZ) */
+/*       character     ALMEVTCLASS$*(ALMEVTCLASS_SZ) */
+/*       integer*4     ALMEVTSEQID(2) */
+/*       integer*4     ALMEVTEEINITID(2) */
+/*       integer*4     ALMEVTEXEID(2) */
+/*       integer*2     ALMEVTIOLIMEE */
+/*       character     ALMEVTSHLVREASON$*(ALMEVTSHLVREASON_SZ) */
+/*       integer*4     ALMEVTRECEIVEDDELAY */
+/*       character     ALMEVTBLOCK$*(ALMEVTBLOCK_SZ) */
+
+/*       equivalence  (ALMEVTSTRUCT ,ALMEVTBUF(1)) */
+/*       equivalence  (ALMEVTTIME ,ALMEVTBUF(ALMEVTXTIME )) */
+/*       equivalence  (ALMEVTETIME ,ALMEVTBUF(ALMEVTXETIME )) */
+/*       equivalence  (ALMEVTQUAL ,ALMEVTBUF(ALMEVTXQUAL )) */
+/*       equivalence  (ALMEVTBIAS ,ALMEVTBUF(ALMEVTXBIAS )) */
+/*       equivalence  (ALMEVTEBIAS ,ALMEVTBUF(ALMEVTXEBIAS )) */
+/*       equivalence  (ALMEVTACD ,ALMEVTBUF(ALMEVTXACD )) */
+/*       equivalence  (ALMEVTPRI ,ALMEVTBUF(ALMEVTXPRI )) */
+/*       equivalence  (ALMEVTCAT ,ALMEVTBUF(ALMEVTXCAT )) */
+/*       equivalence  (ALMEVTHLD_ID ,ALMEVTBUF(ALMEVTXHLD_ID )) */
+/*       equivalence  (ALMEVTSEV ,ALMEVTBUF(ALMEVTXSEV )) */
+/*       equivalence  (ALMEVTDEFMAP ,ALMEVTBUF(ALMEVTXDEFMAP )) */
+/*       equivalence  (ALMEVTFLAGS ,ALMEVTBUF(ALMEVTXFLAGS )) */
+/*       equivalence  (ALMEVTLINK1TYPE ,ALMEVTBUF(ALMEVTXLINK1TYPE )) */
+/*       equivalence  (ALMEVTLINK2TYPE ,ALMEVTBUF(ALMEVTXLINK2TYPE )) */
+/*       equivalence  (ALMEVTLINK3TYPE ,ALMEVTBUF(ALMEVTXLINK3TYPE )) */
+/*       equivalence  (ALMEVTSIG2LEVEL ,ALMEVTBUF(ALMEVTXSIG2LEVEL )) */
+/*       equivalence  (ALMEVTALERTACCESS, ALMEVTBUF(ALMEVTXALERTACCESS)) */
+/*       equivalence  (ALMEVTSRC$ ,ALMEVTBUF(ALMEVTXSRC )) */
+/*       equivalence  (ALMEVTCON$ ,ALMEVTBUF(ALMEVTXCON )) */
+/*       equivalence  (ALMEVTSUBCON$ ,ALMEVTBUF(ALMEVTXSUBCON )) */
+/*       equivalence  (ALMEVTACT$ ,ALMEVTBUF(ALMEVTXACT )) */
+/*       equivalence  (ALMEVTACTOR$ ,ALMEVTBUF(ALMEVTXACTOR )) */
+/*       equivalence  (ALMEVTDES$ ,ALMEVTBUF(ALMEVTXDES )) */
+/*       equivalence  (ALMEVTVALTYPE ,ALMEVTBUF(ALMEVTXVALTYPE )) */
+/*       equivalence  (ALMEVTPREVVALTYPE ,ALMEVTBUF(ALMEVTXPREVVALTYPE )) */
+/*       equivalence  (ALMEVTUNT$ ,ALMEVTBUF(ALMEVTXUNT )) */
+/*       equivalence  (ALMEVTACCRSN$ ,ALMEVTBUF(ALMEVTXACCRSN )) */
+/*       equivalence  (ALMEVTAST$ ,ALMEVTBUF(ALMEVTXAST )) */
+/*       equivalence  (ALMEVTFLEX ,ALMEVTBUF(ALMEVTXFLEXBASE )) */
+/*       equivalence  (ALMEVTVAL ,ALMEVTBUF(ALMEVTXVAL )) */
+/*       equivalence  (ALMEVTPREVVAL ,ALMEVTBUF(ALMEVTXPREVVAL )) */
+/*       equivalence  (ALMEVTLIM ,ALMEVTBUF(ALMEVTXLIM )) */
+/*       equivalence  (ALMEVTCRDNUM ,ALMEVTBUF(ALMEVTXCRDNUM )) */
+/*       equivalence  (ALMEVTID ,ALMEVTBUF(ALMEVTXID )) */
+/*       equivalence  (ALMEVTTRANSID ,ALMEVTBUF(ALMEVTXTRANSID )) */
+/*       equivalence  (ALMEVTVAL$ ,ALMEVTBUF(ALMEVTXVAL )) */
+/*       equivalence  (ALMEVTPREVVAL$ ,ALMEVTBUF(ALMEVTXPREVVAL )) */
+/*       equivalence  (ALMEVTHLD1ST$ ,ALMEVTBUF(ALMEVTXHLD1ST )) */
+/*       equivalence  (ALMEVTHLDLAST$ ,ALMEVTBUF(ALMEVTXHLDLAST )) */
+/*       equivalence  (ALMEVTSTN$ ,ALMEVTBUF(ALMEVTXSTN )) */
+/*       equivalence  (ALMEVTREASON$ ,ALMEVTBUF(ALMEVTXREASON )) */
+/*       equivalence  (ALMEVTSIGMEAN$ ,ALMEVTBUF(ALMEVTXSIGMEAN )) */
+/*       equivalence  (ALMEVTSIGMEAN2$ ,ALMEVTBUF(ALMEVTXSIGMEAN2 )) */
+/*       equivalence  (ALMEVTLINK1$ ,ALMEVTBUF(ALMEVTXLINK )) */
+/*       equivalence  (ALMEVTLINK2$ ,ALMEVTBUF(ALMEVTXLINK+ALMEVTLINK_SZ )) */
+/*       equivalence  (ALMEVTLINK3$ ,ALMEVTBUF(ALMEVTXLINK+(2*ALMEVTLINK_SZ))) */
+/*       equivalence  (ALMEVTAUTHOR$ ,ALMEVTBUF(ALMEVTXAUTHOR)) */
+/*       equivalence  (ALMEVTSRCENTITYNAME$ ,ALMEVTBUF(ALMEVTXSRCENTITYNAME )) */
+/*       equivalence  (ALMEVTLOCTAGNAME$ ,ALMEVTBUF(ALMEVTXLOCTAGNAME )) */
+/*       equivalence  (ALMEVTLOCFULLNAME$ ,ALMEVTBUF(ALMEVTXLOCFULLNAME )) */
+/*       equivalence  (ALMEVTCLASS$ ,ALMEVTBUF(ALMEVTXCLASS )) */
+/*       equivalence  (ALMEVTSEQID ,ALMEVTBUF(ALMEVTXSEQID )) */
+/*       equivalence  (ALMEVTEEINITID ,ALMEVTBUF(ALMEVTXEEINITID )) */
+/*       equivalence  (ALMEVTEXEID ,ALMEVTBUF(ALMEVTXEXEID )) */
+/*       equivalence  (ALMEVTIOLIMEE ,ALMEVTBUF(ALMEVTXIOLIMEE )) */
+/*       equivalence  (ALMEVTSHLVREASON$ ,ALMEVTBUF(ALMEVTXSHLVREASON )) */
+/*       equivalence  (ALMEVTRECEIVEDDELAY ,ALMEVTBUF(ALMEVTXRECEIVEDDELAY )) */
+/*       equivalence  (ALMEVTBLOCK$ ,ALMEVTBUF(ALMEVTXBLOCK )) */
+#endif	
+
+
+#endif	
+/*------------------------------------------------------------------------------- */
+/* Event message */
+/*------------------------------------------------------------------------------- */
+/* DESCRIPTION: */
+/*   This is the text equivalent of the event line. It is used to generate */
+/*   text alarms and events for consuption by almmsg() and evtmsg(). */
+/*   It is also used for printing and reports. */
+
+/* NOTE: */
+/*   Field sizes are taken from new size parameters at the top of this file. */
+/*   These EVFMSG symbols have been kept to minimise impact on old code. */
+
+/* WARNING: */
+/*   This diagram of the layout may be incorrect if symbol sizes were changed */
+/*   and this diagram was not updated. */
+
+/*              1         2    2    3         4         5         6 */
+/*     12345678901234567890123 5678901234567890123456789012345678901234 */
+/*     dd-mmm-yy  hh:mm:ss.mmm name...........(40 char)................ */
+
+/*                                       1           2        2       2 */
+/*     6   7         8      8    9    9  0           1        2       2 */
+/*     67890123456789012345 7890 2345 7890123456.....123456789012345678 */
+/*     alarm...(20 char)... ^    ^    description.....(132 char)....... */
+/*     event...(20 char)... ^    ^ */
+/*       ^                  ^    ^ */
+/*       ^                  ^    level - e.g. U 10, H 14, L 08, J 00 */
+/*       ^                  ^ */
+/*       ^                  event action - eg RTN, ACK, CNF */
+/*       ^ */
+/*       e.g. PVHI,SVCHG */
+
+/*     2             2    2    2       2  2        2        2    2    3       3 */
+/*     3             5    5    6       6  7        8        8    9    3       3 */
+/*     01234...4567890123 567890123456 89012345678901234567 901234...9012345678 */
+/*     value...(24 chars) units....... dd-mmm-yy  hh:mm:ss  Holder...(50 chars) */
+/*      # cardnumber */
+
+/*     3         3          3        3           4          4         4 */
+/*     4         5          6        9           0          4         5 */
+/*     01234567890123456789 1234....901234567890 23456789...012345678901 */
+/*     Reason....(20 chars) Area...(40 chars)... Operator...(50 char)... */
+
+
+#define	EVFDAT_SZ	23
+#define	EVFPNT_SZ	ALMEVTSRC_SZ
+#define	EVFALM_SZ	ALMEVTCON_SZ
+#define	EVFACT_SZ	ALMEVTACT_SZ
+#define	EVFLVL_SZ	4
+#define	EVFDES_SZ	ALMEVTDES_SZ
+#define	EVFVAL_SZ	ALMEVTVAL_SZ
+#define	EVFUNT_SZ	ALMEVTUNT_SZ
+#define	EVFEDT_SZ	20
+#define	EVFHLD_SZ	ALMEVTHLD1ST_SZ
+#define	EVFRSN_SZ	ALMEVTACCRSN_SZ
+#define	EVFAST_SZ	ALMEVTAST_SZ
+#define	EVFOPR_SZ	ALMEVTACTOR_SZ
+
+#define	EVFDAT	1
+#define	EVFPNT	(EVFDAT+EVFDAT_SZ+1)
+#define	EVFALM	(EVFPNT+EVFPNT_SZ+1)
+#define	EVFACT	(EVFALM+EVFALM_SZ+1)
+#define	EVFLVL	(EVFACT+EVFACT_SZ+1)
+#define	EVFDES	(EVFLVL+EVFLVL_SZ+1)
+#define	EVFVAL	(EVFDES+EVFDES_SZ+1)
+#define	EVFUNT	(EVFVAL+EVFVAL_SZ+1)
+#define	EVFEDT	(EVFUNT+EVFUNT_SZ+1)
+#define	EVFHLD	(EVFEDT+EVFEDT_SZ+1)
+#define	EVFRSN	(EVFHLD+EVFHLD_SZ+1)
+#define	EVFAST	(EVFRSN+EVFRSN_SZ+1)
+#define	EVFOPR	(EVFAST+EVFAST_SZ+1)
+#define	EVFEND	(EVFOPR+EVFOPR_SZ-1)
+
+#define	EVFDAT_E	(EVFDAT+EVFDAT_SZ-1)
+#define	EVFPNT_E	(EVFPNT+EVFPNT_SZ-1)
+#define	EVFALM_E	(EVFALM+EVFALM_SZ-1)
+#define	EVFACT_E	(EVFACT+EVFACT_SZ-1)
+#define	EVFLVL_E	(EVFLVL+EVFLVL_SZ-1)
+#define	EVFDES_E	(EVFDES+EVFDES_SZ-1)
+#define	EVFVAL_E	(EVFVAL+EVFVAL_SZ-1)
+#define	EVFUNT_E	(EVFUNT+EVFUNT_SZ-1)
+#define	EVFEDT_E	(EVFEDT+EVFEDT_SZ-1)
+#define	EVFHLD_E	(EVFHLD+EVFHLD_SZ-1)
+#define	EVFRSN_E	(EVFRSN+EVFRSN_SZ-1)
+#define	EVFAST_E	(EVFAST+EVFAST_SZ-1)
+#define	EVFOPR_E	(EVFOPR+EVFOPR_SZ-1)
+
+#define	EVFMSZ	EVFEND
+
+/*       character     EVFMSG$*(EVFMSZ) */
+/*       character     EVFDAT$*(EVFDAT_SZ) */
+/*       character     EVFPNT$*(EVFPNT_SZ) */
+/*       character     EVFALM$*(EVFALM_SZ) */
+/*       character     EVFACT$*(EVFACT_SZ) */
+/*       character     EVFLVL$*(EVFLVL_SZ) */
+/*       character     EVFDES$*(EVFDES_SZ) */
+/*       character     EVFVAL$*(EVFVAL_SZ) */
+/*       character     EVFUNT$*(EVFUNT_SZ) */
+/*       character     EVFEDT$*(EVFEDT_SZ) */
+/*       character     EVFHLD$*(EVFHLD_SZ) */
+/*       character     EVFRSN$*(EVFRSN_SZ) */
+/*       character     EVFAST$*(EVFAST_SZ) */
+/*       character     EVFOPR$*(EVFOPR_SZ) */
+
+/*       equivalence  (EVFMSG$(EVFDAT:) , EVFDAT$) */
+/*       equivalence  (EVFMSG$(EVFPNT:) , EVFPNT$) */
+/*       equivalence  (EVFMSG$(EVFALM:) , EVFALM$) */
+/*       equivalence  (EVFMSG$(EVFACT:) , EVFACT$) */
+/*       equivalence  (EVFMSG$(EVFLVL:) , EVFLVL$) */
+/*       equivalence  (EVFMSG$(EVFDES:) , EVFDES$) */
+/*       equivalence  (EVFMSG$(EVFVAL:) , EVFVAL$) */
+/*       equivalence  (EVFMSG$(EVFUNT:) , EVFUNT$) */
+/*       equivalence  (EVFMSG$(EVFEDT:) , EVFEDT$) */
+/*       equivalence  (EVFMSG$(EVFHLD:) , EVFHLD$) */
+/*       equivalence  (EVFMSG$(EVFRSN:) , EVFRSN$) */
+/*       equivalence  (EVFMSG$(EVFAST:) , EVFAST$) */
+/*       equivalence  (EVFMSG$(EVFOPR:) , EVFOPR$) */
+
+#if	!defined( inside_IDL )
+
+
+
+#include "hsctypes.h"
+
+typedef union		/* This structure is used to store values and flexible attributes */
+   {
+   char	text[ALMEVTFLEX_SZ];	/*space extended string*/
+   short	int2;
+   long	int4;
+   int8	int8;
+   float	real;
+   double	dble;
+   } evtvalue;
+
+struct	almevtfil
+    {
+    HSCTIME hosttime;		/* host time */
+    HSCTIME fieldtime;		/* field time*/
+    int2 hostbias;			/* host time bias */
+    int2 fieldbias;			/* field time bias */
+    int2 area;			/* the event area */
+    int2 priority;			/* priority, subpriority and flags */
+    int4 holder_id;			/* holder_id */
+    int4 category;			/* category */
+    int2 valuetype;			/* value type */
+    int2 GDAconnection;		/* connection number */
+    int2 defmap[ALMEVTDEFMAP_SZ];	/* attribute definition map */
+    int4 severity;			/* OPC severity */
+    int2 prevvaluetype;		/* value type */
+    int2 quality;			/* value */
+    int2 changedbias;			/* changed time bias */
+    int2 flags;
+    int2 link1type;			/* link types */
+    int2 link2type;
+    int2 link3type;
+    int2 sig2_level;
+    int2 alertaccess;
+    int2 iolimee;
+    int2 GDAorgconnection;            /* original connection number */
+    int2 spare1;                      /* spare */
+    int4 receiveddelay;               /* millisecond difference between host time and server time */
+    double limit;			/* alarm limit */
+    HSCTIME changedtime;		/* last changed time*/
+    double cardnumber;			/* card number */
+    int8 id;				/* Event ID */
+    int8 transid;			/* Transaction ID */
+    int8 seqid;			/* Sequence ID */
+    int8 EEinitid;		/* EE Init ID */
+    int8 exeid;		/* Execution ID */
+    evtvalue prevvalue;		/* previous value */
+    evtvalue value;			/* value */
+    evtvalue flex[ALMEVTFLEXCOUNT];	/* flexible attributes */
+    char source[ALMEVTSRC_SZ];	/* source  eg point name*/
+    char desc[ALMEVTDES_SZ];		/* description */
+    char actor[ALMEVTACTOR_SZ];	/* actor eg operator*/
+    char cardholder_1st[ALMEVTHLD1ST_SZ];	/* card holder first name*/
+    char cardholder_last[ALMEVTHLDLAST_SZ];	/* card holder last name*/
+    char condition[ALMEVTCON_SZ];	/* condition */
+    char subcondition[ALMEVTCON_SZ];	/* subcondition */
+    char action[ALMEVTACT_SZ];	/* action */
+    char units[ALMEVTUNT_SZ];		/* units */
+    char accessreason[ALMEVTACCRSN_SZ];	/* units */
+    char areaname[ALMEVTAST_SZ];	/* area name */
+    char link1[ALMEVTLINK_SZ];		/* navigation link */
+    char link2[ALMEVTLINK_SZ];		/* navigation link */
+    char link3[ALMEVTLINK_SZ];		/* navigation link */
+    char comment[ALMEVTCOMMENT_SZ];		/* comment */
+    char station[ALMEVTSTN_SZ];		/* station */
+    char reason[ALMEVTREASON_SZ];	/* reason */
+    char sig_meaning[ALMEVTSIGMEAN_SZ];	/* signature meaning */
+    char sig_meaning2[ALMEVTSIGMEAN_SZ];	/* second signature meaning (for C200 controllers only) */
+    char author[ALMEVTACTOR_SZ];
+    char source_entityname[ALMEVTSRCENTITYNAME_SZ]; /* source entity name */
+    char location_tagname[ALMEVTLOCTAGNAME_SZ];     /* location tag name (tagname of source's parent entity) */
+    char location_fullname[ALMEVTLOCFULLNAME_SZ];   /* location full name (fully qualified name) */
+    char classification[ALMEVTCLASS_SZ];   /* classification field for user alerts */
+    char ebireserved[ALMEVTEBIRESERVED_SZ];   /* reserved for ebi fields in 840 */
+    char shlvreason[ALMEVTSHLVREASON_SZ];     /* alarm shelving reason */
+    char block[ALMEVTBLOCK_SZ];     /* CEE function block name */
+    /*int2 spare[ALMEVTSPARECOUNT];	/* spare */
+    };
+
+
+  /*	PROTOTYPES  */
+EXTERN_C int2 SetAttributeMap(int2,int2*,int2);
+EXTERN_C void SetStdAttributeMap(int2*);
+EXTERN_C int2 IsAttributeMapSet(int2,int2*);
+
+EXTERN_C void GetPriorityString (char*,int2,int2,int2);
+
+EXTERN_C int2 Evfmsg2Event(char*,int2,struct almevtfil*);
+EXTERN_C int2 Event2Evfmsg(char*,int2,struct almevtfil*);
+EXTERN_C void Evtval2String(char*,int2,evtvalue *,int2);
+
+EXTERN_C int2 GetAttributeType(int2);
+EXTERN_C int2 GetAttributeOPCId(int2);
+EXTERN_C unsigned int GetAttributeIndex(const char *szAttribName);
+EXTERN_C int2 GetAttributeName(int2,char *,int2);
+EXTERN_C int GetFlexibleAttributeDetails(char ***,int2 **,int2**);
+EXTERN_C void DestroyFlexibleAttributeDetails(int,char ***,int2 **,int2**);
+EXTERN_C int GetStandardOPCAttributes (int2 **);
+EXTERN_C int GetExtendedOPCAttributes (DWORD,int2 ** ,DWORD ** ,wchar_t *** ,int2 **);
+EXTERN_C int GetMappableAttributes (DWORD, int2 **);
+
+
+
+#endif	
+#endif	
+

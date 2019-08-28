@@ -1,0 +1,1253 @@
+/* TO BE PROCESSED BY DEF FILE PARSER */
+#if	!defined( GDATBLSZ )
+
+/*                   GDATBL - generic data access table */
+/*                   ---------------------------------- */
+
+/*     REVISION: */
+/*         @(#)gdatbl_def,v   830.1.1.19 */
+
+/*     DESCRIPTION: */
+/*         The structure of the GDA table is declared in this file. */
+/*         There is one record per GDA connection. The last record is */
+/*	  reserved for CDA. */
+
+/*     ------------------------------------------------------------------------- */
+/*     NOTES - */
+
+/*         This DEF file has been identified as one that encapsulates both run-time */
+/*         and configuration data. This means that changes made to this file will */
+/*         have an impact on Console Station replication and redirection (ER 2675). */
+/*         If you intend to make changes to this file, please determine whether the */
+/*         information needs to be replicated to the Console Station. If necessary, */
+/*         you will need to create/update the bit mask. */
+
+/*         Here is a guide on how to update DEF files: */
+
+/*         Please refer to the DEF file parser whitepaper for more info: */
+
+/*         \\as01hscborg\Products\Experion PKS\r200\Enhancements\ER2675 Direct (Class 1) Station\Design\zDirectStationDefFileParser.doc */
+
+/*         I.)   Adding, modifying or deleting a constant/macro definition */
+
+/*           Constant/macro definitions should not be defined in the C section as */
+/*           #defines. They should be defined as Fortran definitions in the Fortran */
+/*           section instead. */
+
+/*         II.)  Adding, modifying or deleting a field in the C struct */
+
+/*           1. Must declare the field as one of the defined types. (i.e. byte, char, */
+/*              short, int2, int4, int8, uint2, uint4, int, long, unsigned, float, */
+/*              double, HSCTIME or PNTNUM) */
+
+/*           2. Classify the field as either run-time/configuration/a combination of */
+/*              both based on the following definitions: */
+
+/*               * Configuration data is static data used to configure the Experion */
+/*                 PKS/EBI system. It normally doesn’t change very often. It is */
+/*                 persistent in that configuration data values are restored when */
+/*                 the server is stopped and restarted. Configuration data must be */
+/*                 replicated from the Cluster Server to connected Console Stations. */
+/*                 Examples of such include: sysflg1 (1st word in sysflag) and */
+/*                 emsTimeoutLong in SYSFLG (EMS long timeout). */
+
+/*               * Run-time data is made up of values required by a running system. */
+/*                 Run time data tends to be much more dynamic than configuration */
+/*                 data in that it is continually modified by the system. It is not */
+/*                 persistent in that it is often reinitialised when Experion PKS / */
+/*		  EBI is stopped and restarted. Run-time data must be preserved on */
+/*	          each individual Console Station. Examples of such include: */
+/*	          Scn_Proc4 in SYSFLG (number of scan words processed) and */
+/*                 NotifReconnectDate in GDATBL (Julian Days). */
+
+/*               * A mixed type is defined as a field which has a combination of */
+/*                 both configuration and run-time data. Examples are: notcli in */
+/*                 SYSFLG (flags that control notcli behaviour) and ServerFlags in */
+/*                 GDATBL (flags indicating server status). */
+
+/*           3. Mark the field as either run-time/configuration/a combination of both */
+
+/*               * Use the attribute “R” for run-time data */
+/*               * Use the attribute “C” for configuration data */
+/*               * Use the attribute “M” for mixed data type (both run-time & */
+/*                 configuration) */
+/*               * Place the attribute next to the Fortran asterisk at the beginning */
+/*                 of the line. */
+/*                 e.g. */
+
+/*                   *C     int2  Name [GDANAMSZ/2];     // connection name */
+
+/*               * A mixed data type must accompany with a hexadecimal mask. The */
+/*                 size of the hexadecimal mask must equal to the size of the */
+/*                 type in the definition. */
+/*               * Place the hexadecimal mask after the C comment of each field */
+/*                 using the format as shown in the example below: */
+
+/*                   *M     int2  ServerFlags;           // flags indicating server status  [mask=0xFEDF] */
+
+/*           4. Ensure that each field in the struct is aligned. */
+
+/*           5. Run “make” again after each update in %std%\def\src to ensure the */
+/*              DEF file parser doesn’t return any error messages. */
+
+/*           6. Check that the hexadecimal mask and the bit map generated in the */
+/*	       %std%\include\src\XXXXXX_map is correct. Note that XXXXXX is the */
+/*	       base name of the DEF file. */
+
+/*     ------------------------------------------------------------------------- */
+
+/*     DEPENDENCIES: */
+#include	"system"
+
+/*     DEFINITIONS: */
+
+#define	GDATBLSZ	512 			/*  record size */
+
+#define	GDA_MAX_CONNECTIONS	(NUM_AREAS)
+
+#define	GDA_LOCAL_CONNECTION	0			/*  reservered for local data access */
+#define	GDA_BASE_CONNECTION	1			/*  base DSA connection number */
+#define	GDA_LAST_DSA_CONNECTION	498         		/*  last DSA connection number */
+#define	GDA_CS_CONNECTION	499        		/*  The direct station to cluster server connection 0 based index into the gdatbl */
+#define	GDA_PNTSRV_BASE_CONNECTION	500			/*  base PointServer connection number */
+#define	GDA_PHD_CONNECTION	(NUM_AREAS -3)	/*  PHD Point Server connection */
+#define	GDA_SYSMGT_CONNECTION	(NUM_AREAS -2)	/*  System Event and Performance Servers connection */
+#define	GDA_LAST_CONNECTION	(NUM_AREAS -2)	/*  last GDA connection number */
+#define	GDA_CDA_CONNECTION	(NUM_AREAS -1)	/*  reservered for CDA data access */
+
+#define	GDA_CACHEMNGR_CHECKPERIOD	1000 			/*  period at which gdacachemngr checks lists */
+
+#define	GDA_TOTAL_ROLLOVER	1000000000		/*  value at which int4 totals roll over */
+
+#define	GDANAMSZ	16
+#define	GDAABBSZ	5
+#define	GDATYPSZ	20
+#define	GDASNMSZ	20
+#define	GDASIDSZ	40
+#define	GDALNSSZ	2
+#define	GDALNNUM	4			/*  number of links */
+#define	GDAMAPFILSZ	(GDANAMSZ)
+#define	GDALNKNMSZ	(GDASNMSZ+GDALNSSZ)
+
+#define	GDAOVLMIN	0
+#define	GDAOVLMAX	21
+#define	GDAOVLALM	14
+#define	GDAOVLRTN	7
+
+#define	GDAOVL_COUNT_MASK	0x7fff	
+#define	GDAOVL_INALM_MASK	0x8000	
+#define	GDAOVL_INALM	0x8000	
+
+/*     Defines for calling hsc_point_number_ex */
+/*	Action argument layout */
+#define	GDA_PNTNUM_ACTION	0x000000FF	
+#define	GDA_PNTNUM_ONE_FRAGMENT	0x00010000	
+/*	Action values */
+#define	GDA_PNTNUM_FINDALWAYS	0
+#define	GDA_PNTNUM_FINDALL	1
+#define	GDA_PNTNUM_FINDLOCAL	2
+#define	GDA_PNTNUM_FINDNONDIRECT	3
+#define	GDA_PNTNUM_FINDLCLNONHIERARCHY	4
+#define	GDA_PNTNUM_FINDALL_NONPSA	5
+#define	GDA_PNTNUM_LCLNONHIERARCHY_NODISCOVER	6
+#define	GDA_PNTNUM_NONDIRECT_NODISCOVER	7
+#define	GDA_PNTNUM_FINDLOCAL_NODISCOVER	8
+#define	GDA_PNTNUM_FINDLOCAL_ALLPSA	9
+
+/*     Defines for calling hsc_param_number_ex */
+/*	Action argument layout */
+#define	GDA_PRMNUM_ACTION	0x000000FF	
+#define	GDA_PRMNUM_ONE_FRAGMENT	0x00010000	
+/*	Action values */
+/*     none at this time */
+
+/*     The first Point Server record number */
+#define	GDAPNTSRV_BASEREC	(GDA_PNTSRV_BASE_CONNECTION+1)
+
+/*     OPC Visitor browsing options */
+#define	OPC_BROWSE_AREAS	1
+#define	OPC_BROWSE_ATTRS	2
+#define	OPC_STATE_CHANGE	3
+
+/*     Records in acronym file holding descriptions for gda tags */
+#define	GDADESC_LOCAL	794
+/*     GDADESC_REMOTE = POINTTYPE_RDA_ACR (see lsttag_def) */
+/*     GDADESC_PNTSRV = POINTTYPE_PSA_ACR (see lsttag_def) */
+
+/*               ProgId Category Types */
+
+#define	PROGID_OPCDASERVER10	0
+#define	PROGID_OPCDASERVER20	1
+#define	PROGID_OPCAESERVER10	2
+
+
+/*                                        5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*       integer*2  GDANAM    ;*           --------------------------------- */
+#define	GDANAM	1	/*       1, 8 ! connection name     (16 char) ! */
+/*                                       --------------------------------- */
+/*                                     9 ! data server overload state    ! */
+/*                                       --------------------------------- */
+/*                                    10 ! notif server overload state   ! */
+/*       integer*2  GDATYP    ;*           --------------------------------- */
+#define	GDATYP	11	/*      11,20 ! connection type     (20 char) ! */
+/*       integer*2  GDASNM    ;*           --------------------------------- */
+#define	GDASNM	21	/*      21,30 ! server name         (20 char) ! */
+/*       integer*2  GDASID    ;*           --------------------------------- */
+#define	GDASID	31	/*      31,50 ! server progid       (40 char) ! */
+/*       integer*2  GDATUNE_STRT ;*        --------------------------------- */
+#define	GDATUNE_STRT	51	 /*     !                               ! */
+/*                                    51 ! connection timeout      (sec) ! */
+/*                                       --------------------------------- */
+/*                                    52 ! read timeout            (sec) ! */
+/*       integer*2  GDATUNE_INT4_STRT ;*   --------------------------------- */
+#define	GDATUNE_INT4_STRT	53	/* !                               ! */
+/*                                 53-54 ! cache flush interval     (ms) ! */
+/*                                       --------------------------------- */
+/*                                 55-56 ! cache flush age          (ms) ! */
+/*                                       --------------------------------- */
+/*                                 57-58 ! cache value valid time   (ms) ! */
+/*       integer*2  GDATUNE_INT4_END ;*    --------------------------------- */
+#define	GDATUNE_INT4_END	60	/*  !                               ! */
+/*                                 59-60 ! read  value valid time   (ms) ! */
+/*       integer*2  GDATUNE_END ;*         --------------------------------- */
+#define	GDATUNE_END	61	 /*      !                               ! */
+/*                                    61 ! list fragment size (number    ! */
+/*                                       ! that can be read in 1 second) ! */
+/*                                       --------------------------------- */
+/*       integer*2  GDALNK0_SUFFIX ;*   62 ! link 0 suffix                 ! */
+#define	GDALNK0_SUFFIX	62	 /*   --------------------------------- */
+/*                                    63 ! link 1 suffix                 ! */
+/*                                       --------------------------------- */
+/*                                    64 ! link 2 suffix                 ! */
+/*                                       --------------------------------- */
+/*                                    65 ! link 3 suffix                 ! */
+/*       integer*2  GDALNK0_STATE ;*       --------------------------------- */
+#define	GDALNK0_STATE	66	 /* 66 ! link 0 state                  ! */
+/*                                       --------------------------------- */
+/*                                    67 ! link 1 state                  ! */
+/*                                       --------------------------------- */
+/*                                    68 ! link 2 state                  ! */
+/*                                       --------------------------------- */
+/*                                    69 ! link 3 state                  ! */
+/*                                       --------------------------------- */
+/*       integer*2  GDASTATE_NOTINUSE */
+#define	GDASTATE_NOTINUSE	0x0000		
+/*					this connection does not use this link */
+/*       integer*2  GDASTATE_NEVERUSED */
+#define	GDASTATE_NEVERUSED	0x0001		
+/*					this connection has not used this link yet */
+/*       integer*2  GDASTATE_FAILED */
+#define	GDASTATE_FAILED	0x0002		
+/*					this connection has used this link yet and failed */
+/*       integer*2  GDASTATE_GOOD */
+#define	GDASTATE_GOOD	0x0003		
+/*					this connection has used this link and is OK */
+/*       integer*2  GDASTATE_BACKUP */
+#define	GDASTATE_BACKUP	0x0004		
+/*					this connection is talking to a backup redundant server on this link */
+/*				    --------------------------------- */
+/*			         70 ! link 0 & 1 release_no         ! */
+/*				    --------------------------------- */
+/*			         71 ! link 2 & 3 release_no         ! */
+/*				    --------------------------------- */
+/*			         72 ! link 0 & 1 adjustment_no      ! */
+/*				    --------------------------------- */
+/*			         73 ! link 2 & 3 adjustment_no      ! */
+/*				    --------------------------------- */
+/*			         74 ! client flags                  ! */
+/*				    !P|O|N|M|L!K!J!I!H!G!F!E!D!C!B!A! */
+/*				    --------------------------------- */
+/*					A - link 0 questionable */
+/*					B - link 1 questionable */
+/*					C - link 2 questionable */
+/*					D - link 3 questionable */
+/*					E - link 0 is data link */
+/*					F - link 1 is data link */
+/*					G - link 2 is data link */
+/*					H - link 3 is data link */
+/*					I - link 0 is notification link */
+/*					J - link 1 is notification link */
+/*					K - link 2 is notification link */
+/*					L - link 3 is notification link */
+/*       integer*2  GDA_LINKQUESTIONABLE */
+#define	GDA_LINKQUESTIONABLE	0x0001		
+/*	    GDA_DATALINK and GDA_NOTIFLINK are used to check the client flags word */
+/*	    GDA_OTHERLINK is passed by other clients and is used to return the DATA */
+/*	    link without checking the state of the remote server. */
+
+/*       integer*2  GDA_DATALINK */
+#define	GDA_DATALINK	0x0010		
+/*       integer*2  GDA_NOTIFLINK */
+#define	GDA_NOTIFLINK	0x0100		
+/*       integer*2  GDA_OTHERLINK */
+#define	GDA_OTHERLINK	0x1000		
+/*				    --------------------------------- */
+/*			         75 ! server flags                  ! */
+/*				    !P!O!N!M!L!K!J!I!H!G!F!E!D!C!B!A! */
+/*				    --------------------------------- */
+/*       integer*2  GDATBLSVRFLAG75 */
+#define	GDATBLSVRFLAG75	75	
+
+/*       integer*2  GDA_DATASERVER_DONT_SUBSCRIBE */
+#define	GDA_DATASERVER_DONT_SUBSCRIBE	0x0004		
+/*       integer*2  GDA_MCUNREACHABLE */
+#define	GDA_MCUNREACHABLE	0x0008		
+/*       integer*2  GDA_DATASERVEROK */
+#define	GDA_DATASERVEROK	(GDA_DATALINK*3)	
+/*       integer*2  GDA_NOTIFSERVEROK */
+#define	GDA_NOTIFSERVEROK	(GDA_NOTIFLINK*3)	
+/*	  NOTE:	use GDA_DATALINK and GDANOTIFLINK from client flags word to acces the server bits */
+/*       integer*2  GDA_SERVERTYPEBITS */
+#define	GDA_SERVERTYPEBITS	0x0003		
+/*       integer*2  GDA_REDUNDANTLAN */
+#define	GDA_REDUNDANTLAN	0x0001		
+/*       integer*2  GDA_REDUNDANTSVR */
+#define	GDA_REDUNDANTSVR	0x0002		
+/*       integer*2  GDA_GDASERVEROVERLOAD */
+#define	GDA_GDASERVEROVERLOAD	0x1000		
+/*       integer*2  GDA_GDANOTSRVOVERLOAD */
+#define	GDA_GDANOTSRVOVERLOAD	0x2000		
+/*       integer*2  GDA_GDASERVERALARMOVERLOAD */
+#define	GDA_GDASERVERALARMOVERLOAD	0x4000		
+/*       integer*2  GDA_GDANOTSRVALARMOVERLOAD */
+#define	GDA_GDANOTSRVALARMOVERLOAD	0x8000		
+/*	  NOTE:	Server Architecture = SERVERTYPEBITS + 1 (because 0 = none for GDAARCHxxxx) */
+
+/*					A - Redundant lan (only set if cant multicast) */
+/*					B - Redundant server (only set if cant multicast) */
+/*					C - Data Server disable subscribes */
+/*					D - Can't multicast to this server */
+/*					E - data server on link 0 OK */
+/*					F - data server on link 1 OK */
+/*					G - data server on link 2 OK */
+/*					H - data server on link 3 OK */
+/*					I - notification server on link 0 OK */
+/*					J - notification server on link 1 OK */
+/*					K - notification server on link 2 OK */
+/*					L - notification server on link 3 OK */
+/*					M - Data Server Overload flag */
+/*					N - Notification Server Overload flag */
+/*					O - Alarm Data Server Overload */
+/*					P - Alarm Notification Server Overload */
+/*				    --------------------------------- */
+/*			         76 ! timezone offset (minutes)     ! */
+/*				    --------------------------------- */
+/*			      77-78 ! data subscription count       ! */
+/*				    --------------------------------- */
+/*			      79-80 ! data subscription average     ! */
+/*       integer*2  GDANOTBUF     ;*   --------------------------------- */
+#define	GDANOTBUF	81	/* 81 ! remote alarm server buffer    ! */
+/*				    ! update interval        (secs) ! */
+/*       integer*2  GDANOTKPA     ;*   --------------------------------- */
+#define	GDANOTKPA	82	/* 82 ! remote alarm server           ! */
+/*				    ! keep alive interval    (secs) ! */
+/*				    --------------------------------- */
+/*				 83 ! remote alarm server           ! */
+/*				    ! connection status             ! */
+/*				    !                       !D!C!B!A! */
+/*				    --------------------------------- */
+/*					A - remote server keep alive rxd */
+
+/*       integer*2  GDA_REMSRV_KPALV_MASK, GDA_REMSRV_KPALV, GDA_REMSRV_KPALV_BIT */
+#define	GDA_REMSRV_KPALV_MASK	0x0001		
+#define	GDA_REMSRV_KPALV	0x0001		
+#define	GDA_REMSRV_KPALV_BIT	0      	
+/*					B - remote server failed keep alive check */
+
+/*       integer*2  GDA_REMSRV_FAIL_MASK, GDA_REMSRV_FAIL, GDA_REMSRV_FAIL_BIT */
+#define	GDA_REMSRV_FAIL_MASK	0x0002		
+#define	GDA_REMSRV_FAIL	0x0002		
+#define	GDA_REMSRV_FAIL_BIT	1      	
+/*					C - remote server connected via RPC */
+
+/*       integer*2  GDA_REMSRV_RPC_MASK, GDA_REMSRV_RPC, GDA_REMSRV_RPC_BIT */
+#define	GDA_REMSRV_RPC_MASK	0x0004		
+#define	GDA_REMSRV_RPC	0x0004		
+#define	GDA_REMSRV_RPC_BIT	2      	
+/*					D - remote server connected via DCOM */
+
+/*       integer*2  GDA_REMSRV_DCOM_MASK, GDA_REMSRV_DCOM, GDA_REMSRV_DCOM_BIT */
+#define	GDA_REMSRV_DCOM_MASK	0x0008		
+#define	GDA_REMSRV_DCOM	0x0008		
+#define	GDA_REMSRV_DCOM_BIT	3      	
+
+/*				    --------------------------------- */
+/*			         84 ! remote alarm server number of ! */
+/*				    ! areas currently subscribed to ! */
+/*				    --------------------------------- */
+/*			      85-86 ! remote alarm server           ! */
+/*                                   ! notification count            ! */
+/*				    --------------------------------- */
+/*			      87-88 ! remote alarm server           ! */
+/*                                   ! notification average          ! */
+/*				    --------------------------------- */
+/*			      89-90 ! number of parameters          ! */
+/*                                   ! currently subscribed to       ! */
+/*				    --------------------------------- */
+/*			         91 ! link state summary            ! */
+/*				    --------------------------------- */
+/*       integer*2  GDASUMMSTATE */
+#define	GDASUMMSTATE	91	
+
+/*       integer*2  GDASUMMSTATE_NOTINUSE */
+#define	GDASUMMSTATE_NOTINUSE	0x0000		
+/*					all links on this connection not in use */
+/*       integer*2  GDASUMMSTATE_NEVERUSED */
+#define	GDASUMMSTATE_NEVERUSED	0x0001		
+/*					all links on this connection failed */
+/*       integer*2  GDASUMMSTATE_FAILED */
+#define	GDASUMMSTATE_FAILED	0x0002		
+/*					all links on this connection failed */
+/*       integer*2  GDASUMMSTATE_MARGINAL */
+#define	GDASUMMSTATE_MARGINAL	0x0003		
+/*					some links good, some failed */
+/*       integer*2  GDASUMMSTATE_GOOD */
+#define	GDASUMMSTATE_GOOD	0x0004		
+/*					all links on this connection good/backup */
+/*       integer*2  GDAARCH */
+#define	GDAARCH	92	
+/*				    --------------------------------- */
+/*			         92 ! Server Architecture           ! */
+/*                                   ! Redundant Host/Dual Lan       ! */
+/*				    --------------------------------- */
+/*       integer*2  GDAARCH_NONE */
+#define	GDAARCH_NONE	0x0000		
+/*				    none */
+/*       integer*2  GDAARCH_SHSL */
+#define	GDAARCH_SHSL	0x0001		
+/*				    single host single lan */
+/*       integer*2  GDAARCH_SHDL */
+#define	GDAARCH_SHDL	0x0002		
+/*				    single host dual lan */
+/*       integer*2  GDAARCH_RHSL */
+#define	GDAARCH_RHSL	0x0003		
+/*				    redundant host single lan */
+/*       integer*2  GDAARCH_RHDL */
+#define	GDAARCH_RHDL	0x0004		
+/*				    redundant host dual lan */
+/*       integer*2  GDACPUA_PRIMARY */
+#define	GDACPUA_PRIMARY	93	
+/*       integer*2  GDACPUB_PRIMARY */
+#define	GDACPUB_PRIMARY	94	
+/*				    --------------------------------- */
+/*			         93 ! link 0 & 1 Cpu Status         ! */
+/*				    --------------------------------- */
+/*			         94 ! link 2 & 3 Cpu Status         ! */
+/*				    --------------------------------- */
+/*       integer*2  GDAABB */
+#define	GDAABB	95	/*  95,97 ! connection abbrev.  ( 5 char) ! */
+/*                                   --------------------------------- */
+/*			         98 ! Data Reconnect Date	    ! */
+/*				    --------------------------------- */
+/*			     99,100 ! Data Reconnect Time           ! */
+/*				    --------------------------------- */
+/*			        101 ! Data Reconnect Count          ! */
+/*				    --------------------------------- */
+/*			        102 ! Notif Reconnect Date          ! */
+/*				    --------------------------------- */
+/*			    103,104 ! Notif Reconnect Time          ! */
+/*				    --------------------------------- */
+/*			        105 ! Notif Reconnect Count         ! */
+/*				    --------------------------------- */
+/*       integer*2  GDARSTDAT     ;*   !                               ! */
+#define	GDARSTDAT	106	/* 106! Stats Reset Date		    ! */
+/*				    --------------------------------- */
+/*			    107,108 ! Stats Reset Time		    ! */
+/*				    --------------------------------- */
+/*			    109,110 ! Param Max Rate		    ! */
+/*				    --------------------------------- */
+/*			    111,112 ! Notif Max Rate                ! */
+/*				    --------------------------------- */
+/*			        113 ! Data Client Count             ! */
+/*				    --------------------------------- */
+/*			        114 ! Notif Client Count            ! */
+/*				    --------------------------------- */
+/*       integer*2  GDACMSDAT     ;*115! SQL cardholder sync status    ! */
+#define	GDACMSDAT	115	/*    !C!D! RESERVED  !     B     ! A ! */
+/*				    --------------------------------- */
+/*				      A - Synchronization status (0-3) */
+/*				      B - Publisher gdatbl record number (1-50) */
+/*				      RESERVED - In case MAX # of DSA servers increases */
+/*				      C - CMS DSA Enabled */
+/*				      D - Server is CMS DSA Publisher */
+/*       integer*2  GDACMSDSA_ENB */
+#define	GDACMSDSA_ENB	0x8000		
+/*					the DSA Server is licenced for DSA CMS */
+/*       integer*2  GDA_REDUNDANCY */
+#define	GDA_REDUNDANCY	0x0002		
+/*					the Server is redundant */
+/*       integer*2  GDACMSDSA_PUB */
+#define	GDACMSDSA_PUB	0x4000		
+/*					the Server is a CMS-DSA Publisher */
+/*				    --------------------------------- */
+/*			        116 ! Data Connection status        ! */
+/*				    --------------------------------- */
+/*			        117 ! Notif Connection status       ! */
+/*       integer*2  GDACON_NOTINUSE */
+#define	GDACON_NOTINUSE	0x0000		
+/*					the data/notif client is not talking */
+/*       integer*2  GDACON_OVERLOAD */
+#define	GDACON_OVERLOAD	0x0001		
+/*					the data/notif server is overloaded */
+/*       integer*2  GDACON_OK */
+#define	GDACON_OK	0x0002		
+/*					the data/notif client is talking */
+/*       integer*2  GDACON_ACCESSDENIED */
+#define	GDACON_ACCESSDENIED	0x0003		
+/*					the data/notif client has been denied access */
+/*       integer*2  GDACON_REJECTACKMOD */
+#define	GDACON_REJECTACKMOD	0x0004		
+/*					the data/notif client has been rejected due to differing ack modes */
+/*       integer*2  GDACON_SERVERBLOCKED */
+#define	GDACON_SERVERBLOCKED	0x0005		
+/*					the data/notif client has been rejected due to previous rpc calls becoming blocked in the server */
+/*       integer*2  GDACON_CONNECTING */
+#define	GDACON_CONNECTING	0x0006		
+/*					the data/notif client is in the process of connecting */
+/*       integer*2  GDACON_INCOMPATIBLE */
+#define	GDACON_INCOMPATIBLE	0x0007		
+/*					the data/notif client is incompatible with the OPC Server */
+/*       integer*2  GDACON_UDPNOTSUPPORTED */
+#define	GDACON_UDPNOTSUPPORTED	0x0008		
+/*					the data/notif client is using UDP and it's not supported on this server */
+
+/*				    --------------------------------- */
+/*				118 ! Stats reset                   ! */
+/*				    --------------------------------- */
+/*			        119 ! Notif Server Architecture     ! */
+/*                                   ! Redundant Host/Dual Lan       ! */
+/*				    --------------------------------- */
+/*				120 ! UDP port PointServer is       ! */
+/*				    ! listening on                  ! */
+/*				    --------------------------------- */
+/*			    121,122 ! Time to call TimeSync (float) ! */
+/*				    --------------------------------- */
+/*			        123 ! Point Server Type             ! */
+/*				    --------------------------------- */
+/*       integer*2  GDAPSTYPE */
+#define	GDAPSTYPE	123	
+/*       integer*2  GDAPSTYPE_ELPAS */
+#define	GDAPSTYPE_ELPAS	1	
+/*       integer*2  GDAPSTYPE_LONWORKS */
+#define	GDAPSTYPE_LONWORKS	2	
+/*       integer*2  GDAPSTYPE_TEMA */
+#define	GDAPSTYPE_TEMA	3	
+/*       integer*2  GDAPSTYPE_BNPS */
+#define	GDAPSTYPE_BNPS	4	
+/*       integer*2  GDAPSTYPE_PMD */
+#define	GDAPSTYPE_PMD	5	
+/*       integer*2  GDAPSTYPE_OPC */
+#define	GDAPSTYPE_OPC	6	
+/*       integer*2  GDAPSTYPE_TPS */
+#define	GDAPSTYPE_TPS	7	
+/*       integer*2  GDAPSTYPE_BACNET */
+#define	GDAPSTYPE_BACNET	8	
+/*       integer*2  GDAPSTYPE_EXCEL5000 */
+#define	GDAPSTYPE_EXCEL5000	9	
+/*       integer*2  GDAPSTYPE_QCS */
+#define	GDAPSTYPE_QCS	12	
+/*       integer*2  GDAPSTYPE_FPS */
+#define	GDAPSTYPE_FPS	14	
+/*       integer*2  GDAPSTYPE_OPCDISPLAY */
+#define	GDAPSTYPE_OPCDISPLAY	15	
+/*       integer*2  GDAPSTYPE_SYSMGT */
+#define	GDAPSTYPE_SYSMGT	16	
+/*       integer*2  GDAPSTYPE_RELATIONAL */
+#define	GDAPSTYPE_RELATIONAL	17	
+/*       integer*2  GDAPSTYPE_PHD */
+#define	GDAPSTYPE_PHD	18	
+/*       integer*2  GDAPSTYPE_OMA */
+#define	GDAPSTYPE_OMA	19	
+/*       integer*2  GDAPSTYPE_URT */
+#define	GDAPSTYPE_URT	20	
+/*       integer*2  GDAPSTYPE_PHD_SRV */
+#define	GDAPSTYPE_PHD_SRV	25	
+/*       integer*2  GDAPSTYPE_TELEPERM */
+#define	GDAPSTYPE_TELEPERM	27	
+/*       integer*2  GDAPSTYPE_IEC870 */
+#define	GDAPSTYPE_IEC870	28	
+/*       integer*2  GDAPSPAGETYPE_STATUS */
+#define	GDAPSPAGETYPE_STATUS	0	
+/*       integer*2  GDAPSPAGETYPE_CONFIG */
+#define	GDAPSPAGETYPE_CONFIG	1	
+/*				    --------------------------------- */
+/*			    124,143 ! notif server progid (40 char) ! */
+/*				    --------------------------------- */
+/*       integer*2  NOTIFGDASID */
+#define	NOTIFGDASID	124	
+/*				    --------------------------------- */
+/*			        144 ! connect fail action           ! */
+/*				    --------------------------------- */
+/*			        145 ! connect error limit           ! */
+/*				    --------------------------------- */
+/*			        146 ! connect error count           ! */
+/*				    --------------------------------- */
+/*       integer*2  GDACONFAILACTION */
+#define	GDACONFAILACTION	144	
+/*       integer*2  GDACON_NO_ACTION */
+/*       integer*2  GDACON_SWITCH_IF_SYNCD, GDACON_SWITCH_ALWAYS */
+/*       integer*2  GDACON_REBOOT_IF_SYNCD, GDACON_REBOOT_ALWAYS */
+#define	GDACON_NO_ACTION	0	
+#define	GDACON_SWITCH_IF_SYNCD	1	
+#define	GDACON_SWITCH_ALWAYS	2	
+#define	GDACON_REBOOT_IF_SYNCD	3	
+#define	GDACON_REBOOT_ALWAYS	4	
+/*       integer*2  GDASVRFLG2      ;* --------------------------------- */
+#define	GDASVRFLG2	147	 /*  ! server flags 2                ! */
+/*				    !P!O!N!M!L!K!J!I!H!G!F!E!D!C!B!A! */
+/*				    --------------------------------- */
+/*       integer*2  GDA_MANAGE_ACKSTATE */
+#define	GDA_MANAGE_ACKSTATE	0x0001		
+/*       integer*2  GDA_ONLY_VALIDATE_FLEXIBLE_PARAMS */
+#define	GDA_ONLY_VALIDATE_FLEXIBLE_PARAMS	0x0008		
+/*       integer*2  GDA_NO_SKELETON_POINTS, GDA_NO_SKELETON_POINTS_BIT */
+#define	GDA_NO_SKELETON_POINTS	0x0010		
+#define	GDA_NO_SKELETON_POINTS_BIT	4	
+/*       integer*2  GDA_USES_TECHNICAL_ADDRESSES, GDA_USES_TECHNICAL_ADDRESSES_BIT */
+#define	GDA_USES_TECHNICAL_ADDRESSES	0x0020		
+#define	GDA_USES_TECHNICAL_ADDRESSES_BIT	5	
+/*       integer*2  GDA_REMOTEQUERYALLOWED */
+#define	GDA_REMOTEQUERYALLOWED	0x0040		
+/*       integer*2  GDA_SEPARATE_NOTIFSRV */
+#define	GDA_SEPARATE_NOTIFSRV	0x0080		
+/*       integer*2  GDA_PING_DATASRV */
+#define	GDA_PING_DATASRV	0x0100		
+/*       integer*2  GDA_PING_NOTIFSRV */
+#define	GDA_PING_NOTIFSRV	0x0200		
+/*       integer*2  GDA_NOTIFSERVERTYPEBITS */
+#define	GDA_NOTIFSERVERTYPEBITS	0x0C00		
+/*       integer*2  GDA_NOTIFSERVERTYPEOFFSET */
+#define	GDA_NOTIFSERVERTYPEOFFSET	10	
+/*       integer*2  GDA_ALMSTATE_NOTIF */
+#define	GDA_ALMSTATE_NOTIF	0x1000		
+/*       integer*2  GDA_ALMSTATE_SUPPLIED */
+#define	GDA_ALMSTATE_SUPPLIED	0x2000		
+/*       integer*2  GDA_ACKSTATE_NOTIF */
+#define	GDA_ACKSTATE_NOTIF	0x4000		
+/*       integer*2  GDA_ACKSTATE_SUPPLIED */
+#define	GDA_ACKSTATE_SUPPLIED	0x8000		
+
+/*     Flags for advanced alarm management */
+/*     Note: These flags are used in std\gdanotif\common\GdaNotTypes.idl, so be careful when adding new flags. */
+
+/*       integer*2  GDA_ALMMGMT_METHOD_MASK, GDA_ALMMGMT_NORM, GDA_ALMMGMT_3STAGE, GDA_ALMMGMT_SRM */
+#define	GDA_ALMMGMT_METHOD_MASK	0x0006		
+#define	GDA_ALMMGMT_NORM	0x0000		  /*  normal alarm management */
+#define	GDA_ALMMGMT_3STAGE	0x0002		  /*  3 stage alarm handling */
+#define	GDA_ALMMGMT_SRM	0x0004		  /*  structured (4 stage) alarm handling */
+
+/*                                       A - manage ack state locally */
+/*                                       B - alarm management method - bit 1 */
+/*                                       C - alarm management method - bit 2 */
+/*                                       D - only validate flexible parameters for pre-built points (Point Servers Only) */
+/*                                       E - disable skeleton point building (to be set by default configuration code in gdaclib.c) */
+/*                                       F - pointserver may use technical addresses (to be set by default configuration code in gdaclib.c) */
+/*                                       G - allow remote servers to query for new points (Point Servers Only) */
+/*                                       H - seperate notification server */
+/*                                       I - ping data server */
+/*                                       J - ping notif server */
+/*                                       K - Notif redundant lan (only set if cant multicast) */
+/*                                       L - Notif redundant server (only set if cant multicast) */
+/*                                       M - propagate point alarm state via data (0) or via notifications (1) */
+/*                                       N - point alarm state determined from alarm list (0) or supplied in each notification (1) */
+/*                                       O - propagate point ack state via data (0) or via notifications (1) */
+/*                                       P - point ack state determined from alarm list (0) or supplied in each notification (1) */
+/*				    --------------------------------- */
+/*			    148,157 ! notif server name   (20 char) ! */
+/*				    --------------------------------- */
+/*       integer*2  NOTIFGDASNM */
+#define	NOTIFGDASNM	148	
+/*				    --------------------------------- */
+/*     				158 ! notif connection timeout(sec) ! */
+/*				    --------------------------------- */
+/*       integer*2  GDATUNE_NOTIFCONNTIMEOUT */
+#define	GDATUNE_NOTIFCONNTIMEOUT	158	
+/*				    --------------------------------- */
+/*				159 ! notif list fragment size (num ! */
+/*				    ! that can be read in 1 second) ! */
+/*				    --------------------------------- */
+/*       integer*2  GDATUNE_NOTIFLISTFRAG */
+#define	GDATUNE_NOTIFLISTFRAG	159	
+/*                                   --------------------------------- */
+/*                               160 ! notif link 0 suffix           ! */
+/*                                   --------------------------------- */
+/*                               161 ! notif link 1 suffix           ! */
+/*                                   --------------------------------- */
+/*                               162 ! notif link 2 suffix           ! */
+/*                                   --------------------------------- */
+/*                               163 ! notif link 3 suffix           ! */
+/*                                   --------------------------------- */
+/*                               164 ! notif link 0 state            ! */
+/*                                   --------------------------------- */
+/*                               165 ! notif link 1 state            ! */
+/*                                   --------------------------------- */
+/*                               166 ! notif link 2 state            ! */
+/*                                   --------------------------------- */
+/*                               167 ! notif link 3 state            ! */
+/*                                   --------------------------------- */
+/*                               168 ! notif client flags            ! */
+/*                                   !P|O|N|M|L!K!J!I!H!G!F!E!D!C!B!A! */
+/*                                   --------------------------------- */
+/*                                       A - link 0 questionable */
+/*                                       B - link 1 questionable */
+/*                                       C - link 2 questionable */
+/*                                       D - link 3 questionable */
+/*                                       E - link 0 is data link */
+/*                                       F - link 1 is data link */
+/*                                       G - link 2 is data link */
+/*                                       H - link 3 is data link */
+/*                                       I - link 0 is notification link */
+/*                                       J - link 1 is notification link */
+/*                                       K - link 2 is notification link */
+/*                                       L - link 3 is notification link */
+/*                                   --------------------------------- */
+/*                               169 ! notif timezone offset (mins)  ! */
+/*                                   --------------------------------- */
+/*                               170 ! Data Connect Attempts         ! */
+/*                                   --------------------------------- */
+/*                               171 ! Notif Connect Attempts        ! */
+/*                                   --------------------------------- */
+/*                               172 ! OPC Area Mapping Option       ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_AREAMAP */
+#define	GDA_AREAMAP	172	
+/*       integer*2  GDA_AREAMAP_SINGLE */
+#define	GDA_AREAMAP_SINGLE	0	
+/*       integer*2  GDA_AREAMAP_NATIVE */
+#define	GDA_AREAMAP_NATIVE	1	
+/*       integer*2  GDA_AREAMAP_CUSTOM */
+#define	GDA_AREAMAP_CUSTOM	2	
+/*                                   --------------------------------- */
+/*                           173-174 ! Total One-Shot Reads          ! */
+/*                                   --------------------------------- */
+/*                           175-176 ! Total One-Shot Writes         ! */
+/*                                   --------------------------------- */
+/*                           177-178 ! Data Transaction Count        ! */
+/*                                   --------------------------------- */
+/*                               179 ! Default mapped OPC area index ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDAADFA */
+#define	GDAADFA	179	
+/*                                   --------------------------------- */
+/*                               180 ! OPC Notification Server Status! */
+/*                                   --------------------------------- */
+/*                               181 ! OPC Data Server Status        ! */
+/*                                   --------------------------------- */
+/*                               182 ! OPC Notifications Enabled     ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_OPC_NOTIF_ENABLED */
+#define	GDA_OPC_NOTIF_ENABLED	182	
+/*                                   --------------------------------- */
+/*                               183 ! OPC Browse Areas Flag         ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_OPC_BROWSE_AREAS */
+#define	GDA_OPC_BROWSE_AREAS	183	
+/*                                   --------------------------------- */
+/*                               184 ! Data Server ProgId Index      ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_DATA_PROGID_INDEX */
+#define	GDA_DATA_PROGID_INDEX	184	
+/*                                   --------------------------------- */
+/*                               185 ! Notif Server ProgId Index     ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_NOTIF_PROGID_INDEX */
+#define	GDA_NOTIF_PROGID_INDEX	185	
+/*       integer*2  GDASVRFLG3      ;* --------------------------------- */
+#define	GDASVRFLG3	186	 /*  ! server flags 3                ! */
+/*                                   !P!O!N!M!L!K!J!I!H!G!F!E!D!C!B!A! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_USES_LOWLEVEL_ADDRESS */
+#define	GDA_USES_LOWLEVEL_ADDRESS	0x0001		
+/*       integer*2  GDA_PNTSRV_RECOVERABLE */
+#define	GDA_PNTSRV_RECOVERABLE	0x0002		
+/*       integer*2  GDA_OPC_AE_SERVER_PINGS_CLIENT */
+#define	GDA_OPC_AE_SERVER_PINGS_CLIENT	0x0004		
+/*       integer*2  GDA_NO_NOTIF_FOR_UNRESOLVED_POINT */
+#define	GDA_NO_NOTIF_FOR_UNRESOLVED_POINT	0x0008		
+/*       integer*2  GDA_TAGCACHE_AUTOUPD_DISABLE */
+#define	GDA_TAGCACHE_AUTOUPD_DISABLE	0x0010		
+/*       integer*2  GDA_TAGCACHE1STPASS */
+#define	GDA_TAGCACHE1STPASS	0x0020		
+/*       integer*2  GDA_ALM_SERWIDE_DSAB */
+#define	GDA_ALM_SERWIDE_DSAB	0x0040		
+/*       integer*2  GDA_OPM_TEST */
+#define	GDA_OPM_TEST	0x0080		
+/*       integer*2  GDA_OPM_TEST_BIT */
+#define	GDA_OPM_TEST_BIT	7	
+/*       integer*2  GDA_OPM_DUAL_PRI */
+#define	GDA_OPM_DUAL_PRI	0x0100		
+/*       integer*2  GDA_TAGCACHE_STARTUPPOP_DISABLE */
+#define	GDA_TAGCACHE_STARTUPPOP_DISABLE	0x0400		
+/*       integer*2  GDA_DIRECT_CONNECTION */
+#define	GDA_DIRECT_CONNECTION	0x0800		
+/*       integer*2  GDA_USE_ACKSTATE */
+#define	GDA_USE_ACKSTATE	0x1000		
+/*       integer*2  GDA_USE_ACKSTATE_BIT */
+#define	GDA_USE_ACKSTATE_BIT	12	
+/*       integer*2  GDA_CSRV_OVR_ACK */
+#define	GDA_CSRV_OVR_ACK	0x4000		
+/*       integer*2  GDA_CSRV_OVR_ACK_BIT */
+#define	GDA_CSRV_OVR_ACK_BIT	14	
+/*       integer*2  GDA_EXPSRVTPS */
+#define	GDA_EXPSRVTPS	0x8000		
+/*       integer*2  GDA_EXPSRVTPS_BIT */
+#define	GDA_EXPSRVTPS_BIT	15	
+
+/*                                       A - use a low level address to access values (OPC only) */
+/*                                       B - pointserver is capable of performing a normal recovery */
+/*                                       C - OPC A&E server sends keepalive packets to client during quiet time */
+/*                                       D - ignore alarms from points not engineered on the server (Point Servers Only) */
+/*                                       E - disable automatic update of tag cache with points from this connection */
+/*                                       F - tag cache has been initially populated with points from this connection */
+/*                                       G - GDA Server has Alarms disabled server-wide (Not for Local Server) */
+/*                                       H - Test OPM */
+/*                                       I - Remote Server A is in Dual Primary OPM mode */
+/*                                       J - Remote Server B is in Dual Primary OPM mode */
+/*                                       K - disable population at startup of tag cache with points from this connection */
+/*                                       L - indicates if this connection is direct or not (only used by direct stations) */
+/*                                       M - use the ack state supplied from the OPC pointserver */
+/*                                       N - spare */
+/*                                       O - If value =1 ignore option M but only on Cluster Server. If value=0, accept ack from below. This is for ESVT. */
+/*                                       P - TPS connection type. 0=Integration Node, 1=Experion Server TPS */
+/*                                   --------------------------------- */
+/*                           187-188 ! OPC Item Prefix     (4 chars) ! */
+/*                                   --------------------------------- */
+/*                           189-190 ! OPC Item Separator  (4 chars) ! */
+/*                                   --------------------------------- */
+/*                           191-192 ! OPC Item Suffix     (4 chars) ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_ITEMSYNTAXSZ */
+#define	GDA_ITEMSYNTAXSZ	4	
+/*                                   --------------------------------- */
+/*                           193,194 ! Connection Drift Deadband     ! */
+/*                                   --------------------------------- */
+/*                               195 ! PointDetailDisplay map option ! */
+/*                                   --------------------------------- */
+/*                           196-205 !     "    map value (20 chars) ! */
+/*                                   --------------------------------- */
+/*                               206 ! GroupDetailDisplay map option ! */
+/*                                   --------------------------------- */
+/*                           207-216 !     "    map value (20 chars) ! */
+/*                                   --------------------------------- */
+/*                               217 ! AssociatedDisplay map option  ! */
+/*                                   --------------------------------- */
+/*                           218-227 !     "    map value (20 chars) ! */
+/*                                   --------------------------------- */
+/*                               228 ! InstructionDisplay map option ! */
+/*                                   --------------------------------- */
+/*                           229-238 !     "    map value (20 chars) ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_PRMMAPSZ */
+#define	GDA_PRMMAPSZ	20	
+/*       integer*2  GDA_PRMMAP_NONE */
+#define	GDA_PRMMAP_NONE	0	     /*  no parameter mapping */
+/*       integer*2  GDA_PRMMAP_CONST */
+#define	GDA_PRMMAP_CONST	1		/*  map to constant value */
+/*       integer*2  GDA_PRMMAP_USRPROP */
+#define	GDA_PRMMAP_USRPROP	2		/*  map to user specified property ID */
+/*       integer*2  GDA_PRMMAP_PARAM */
+#define	GDA_PRMMAP_PARAM	3		/*  map to parameter */
+/*                                   --------------------------------- */
+/*                           239-246 ! OPC mapping file name         ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDAMAPFIL */
+#define	GDAMAPFIL	239	
+/*                                   --------------------------------- */
+/*                               247 ! Redundant OPC server flag     ! */
+/*                                   !P!O!N!M!L!K!J!I!H!G!F!E!D!C!B!A! */
+/*                                   --------------------------------- */
+/*       integer*2  OPC_REDUNDANT_FLAG */
+#define	OPC_REDUNDANT_FLAG	247	
+/*       integer*2  OPC_DATA_REDUNDANT_ENABLED */
+#define	OPC_DATA_REDUNDANT_ENABLED	0x0001		
+/*       integer*2  OPC_NOTIF_REDUNDANT_ENABLED */
+#define	OPC_NOTIF_REDUNDANT_ENABLED	0x0002		
+
+/*                                       A - Redundant OPC Data Server enabled */
+/*                                       B - Redundant OPC Notification Server enabled */
+/*                                       C - */
+/*                                       D - */
+/*                                       E - */
+/*                                       F - */
+/*                                       G - */
+/*                                       H - */
+/*                                       I - */
+/*                                       J - */
+/*                                       K - */
+/*                                       L - */
+/*                                       M - */
+/*                                       N - */
+/*                                       O - */
+/*                                       P - */
+/*                                   --------------------------------- */
+/*                           248-257 ! Primary OPC data              ! */
+/*                                   ! server name         (20 char) ! */
+/*                                   --------------------------------- */
+/*                           258-277 ! Primary OPC data              ! */
+/*                                   ! server progid       (40 char) ! */
+/*                                   --------------------------------- */
+/*                           278-287 ! Secondary OPC data            ! */
+/*                                   ! server name         (20 char) ! */
+/*                                   --------------------------------- */
+/*                           288-307 ! Secondary OPC data            ! */
+/*                                   ! server progid       (40 char) ! */
+/*                                   --------------------------------- */
+/*       integer*2  PRI_OPC_DATA_SNM */
+#define	PRI_OPC_DATA_SNM	248	
+/*       integer*2  PRI_OPC_DATA_SID */
+#define	PRI_OPC_DATA_SID	258	
+/*       integer*2  SEC_OPC_DATA_SNM */
+#define	SEC_OPC_DATA_SNM	278	
+/*       integer*2  SEC_OPC_DATA_SID */
+#define	SEC_OPC_DATA_SID	288	
+/*                                   --------------------------------- */
+/*                           308-317 ! Primary OPC notif             ! */
+/*                                   ! server name         (20 char) ! */
+/*                                   --------------------------------- */
+/*                           318-337 ! Primary OPC notif             ! */
+/*                                   ! server progid       (40 char) ! */
+/*                                   --------------------------------- */
+/*                           338-347 ! Secondary OPC notif           ! */
+/*                                   ! server name         (20 char) ! */
+/*                                   --------------------------------- */
+/*                           348-367 ! Secondary OPC notif           ! */
+/*                                   ! server progid       (40 char) ! */
+/*                                   --------------------------------- */
+/*       integer*2  PRI_OPC_NOTIF_SNM */
+#define	PRI_OPC_NOTIF_SNM	308	
+/*       integer*2  PRI_OPC_NOTIF_SID */
+#define	PRI_OPC_NOTIF_SID	318	
+/*       integer*2  SEC_OPC_NOTIF_SNM */
+#define	SEC_OPC_NOTIF_SNM	338	
+/*       integer*2  SEC_OPC_NOTIF_SID */
+#define	SEC_OPC_NOTIF_SID	348	
+
+/*                                   --------------------------------- */
+/*                           368-430 ! GDA Area Alarms Status Flags  ! */
+/*                                   --------------------------------- */
+
+/*       integer*2 GDAAREAALMSZ */
+#define	GDAAREAALMSZ	((NUM_AREAS/16)+1) 	
+
+/*       integer*2 GDA_PNTUPDATE_TIME(2) */
+#define	GDA_PNTUPDATE_TIME	431	
+/*       integer*4 GDA_PNTCHANGE_TIME(2) */
+#define	GDA_PNTCHANGE_TIME	433	
+/*       integer*4 GDA_APPLIEDPNTCHANGE_TIME(2) */
+#define	GDA_APPLIEDPNTCHANGE_TIME	437	
+/*       integer*2 GDA_PNTUPDATE_DATE */
+#define	GDA_PNTUPDATE_DATE	441	
+/*                                   --------------------------------- */
+/*                           431-432 ! Last time points were         ! */
+/*                                   ! kept up to date (secs since   ! */
+/*                                   ! midnight)			    ! */
+/*                                   --------------------------------- */
+/*                           433-436 ! Last local point change time  ! */
+/*                                   ! (HSCTIME)                     ! */
+/*                                   --------------------------------- */
+/*                           437-440 ! Last point change time whose  ! */
+/*                                   ! changes have been applied to  ! */
+/*                                   ! the tag cache (HSCTIME)       ! */
+/*                                   --------------------------------- */
+/*                               441 ! Last date points were         ! */
+/*                                   ! kept up to date               ! */
+/*				    ! (julien days since 1-1-1981)  ! */
+/*                                   --------------------------------- */
+/*                               442 ! Raw Item Point Number         ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_RAWITEMPNTNUM */
+#define	GDA_RAWITEMPNTNUM	442	
+/*                                   --------------------------------- */
+/*                           443,444 ! Last data error (int4)        ! */
+/*                                   --------------------------------- */
+/*                           445,446 ! Last notif error (int4)       ! */
+/*                                   --------------------------------- */
+/*			    447,448 ! Data Disconnect Time (float)  ! */
+/*				    --------------------------------- */
+/*			    449,450 ! Notif Disconnect Time (float) ! */
+/*				    --------------------------------- */
+/*			        451 ! Data Disconnect Date          ! */
+/*				    --------------------------------- */
+/*			        452 ! Notif Disconnect Date         ! */
+/*				    --------------------------------- */
+/*                           453-456 ! Last remote point change time ! */
+/*                                   ! (HSCTIME)                     ! */
+/*                                   --------------------------------- */
+/*                           457-460 ! Last remote point change time ! */
+/*                                   ! whose changes have been applied! */
+/*                                   ! to the tag cache (HSCTIME)    ! */
+/*                                   --------------------------------- */
+#define	GDALNKNM	461
+/*                                   --------------------------------- */
+/*                           461-471 ! server link name    (22 char) ! */
+/*                                   --------------------------------- */
+/*                               472 ! spare472                      ! */
+/*                                   --------------------------------- */
+/*                               473 ! MoreServerflags               ! */
+/*                                   !P!O!N!M!L!K!J!I!H!G!F!E!D!C!B!A! */
+/*                                   --------------------------------- */
+
+/*     *** If you added a bit, remember to update the config/runtime mask! *** */
+
+#define	GDAMORESRVFLG	473
+
+#define	GDA_DISABLE_BITS_START	1
+#define	GDA_DISABLE_BITS_WIDTH	2
+
+#define	GDA_TRACE_NOTIF	0x0001		/*  A - Trace Notifications for this connection */
+#define	GDA_NOTIF_SUB_DISABLE	0x0002		/*  B - Disable DSA Notif Subscription */
+#define	GDA_DATA_SUB_DISABLE	0x0004		/*  C - Disable DSA Data Subscription */
+#define	GDA_TAG_SUB_DISABLE	0x0008		/*  D - Disable DSA Tag Subscription */
+#define	GDA_NOTIF_RESUBSCRIBE	0x0010		/*  E - DSA Notif Resubscribe */
+#define	GDA_TAG_RESUBSCRIBE	0x0020		/*  F - DSA Tag Resubscribe */
+#define	GDA_CLASSIC_TPS_FACEPLATES	0x0040		/*  G - Use classic TPS faceplates */
+#define	GDA_DISABLE_PARALLEL_ACQ	0x0080		/*  H - Dont acquire in parallel */
+#define	GDA_EXTERNAL_EMSYSTEM	0x0100		/*  I - Server is in an External EM System */
+#define	GDA_ALARM_OVERFLOW	0x0200		/*  J - Alarm overflow status for this connection */
+#define	GDA_CACHE_READ_SUBSCRIBES	0x0400		/*  K - Use cache read for subscribes */
+#define	GDA_ALL_CACHE_READ	0x0800		/*  L - Use cache read instead of devicce reads (OPC Advanced Clients Only) */
+#define	GDA_MAP_OOS_TO_BAD	0x1000		/*  M - Map 'Out of Service' quality to bad quality (OPC Advanced Clients Only) */
+/*                                   					;* N - reserved for use in 840 */
+/*                                   					;* O - reserved for use in 850 */
+#define	GDA_DISABLE_SYSTEM_SUB	0x8000		/*  P - Disable system tree subscription */
+
+/*                                   --------------------------------- */
+/*                               474 ! point discovery fragment size ! */
+/*                                   ! (number that will not cause   ! */
+/*                                   ! timeout, small numbers allow  ! */
+/*                                   ! better sharing of connection, ! */
+/*                                   ! large for better performance) ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_PNTDISCFRAGSZ */
+#define	GDA_PNTDISCFRAGSZ	474	
+/*                                   --------------------------------- */
+/*                           475-476 ! AssetSubCount (uint4)         ! */
+/*                                   --------------------------------- */
+/*                           477-478 ! TagCount      (uint4)         ! */
+/*                                   --------------------------------- */
+/*                           479-480 ! TagCountAvg   (float)         ! */
+/*                                   --------------------------------- */
+/*                           481-482 ! TagMaxRate    (float)         ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_SITEID */
+#define	GDA_SITEID	483	
+/*       integer*2  GDA_LASTISSUEDSITEID */
+#define	GDA_LASTISSUEDSITEID	484	
+/*                                   --------------------------------- */
+/*                               483 ! SQL DSA Site ID               ! */
+/*                                   --------------------------------- */
+/*                               484 ! Last SQL DSA Site ID issued   ! */
+/*                                   ! to subscriber                 ! */
+/*                                   --------------------------------- */
+/*                               485 ! TCP Port DSA Notifications is ! */
+/*                                   ! listening on                  ! */
+/*                                   --------------------------------- */
+/*                               486 ! TCP Port DSA Data is          ! */
+/*                                   ! listening on                  ! */
+/*                                   --------------------------------- */
+/*                           487-488 ! Tag Error Count since last    ! */
+/*                                   ! reconnection or resubscribe   ! */
+/*                                   --------------------------------- */
+/*                           489-490 ! spare (reserved for 850)      ! */
+/*                                   --------------------------------- */
+/*                           491-492 ! reconnect time when source    ! */
+/*				    ! deleted  (ms)                 ! */
+/*                                   --------------------------------- */
+/*                               493 ! Server Flags 4                ! */
+/*                                   ! ! ! ! ! ! ! ! ! ! ! ! !D!C!B!A! */
+/*                                   --------------------------------- */
+/*       integer*2  GDASRVFLG4 */
+#define	GDASRVFLG4	493	
+
+/*     *** If you added a bit, remember to update the config/runtime mask! *** */
+
+/*				    A - By default, uncertain quality items are displayed as if it has good quality, */
+/*                                       bit set will display the item in inverse video */
+/*       integer*2  GDA_DISPLAY_UNCERTAIN_IN_BAD */
+#define	GDA_DISPLAY_UNCERTAIN_IN_BAD	0x0001		
+/*       integer*2  GDA_DISPLAY_UNCERTAIN_IN_BAD_BIT */
+#define	GDA_DISPLAY_UNCERTAIN_IN_BAD_BIT	0	
+
+/*				    B - Disable automatic deletion of TPS points */
+
+/*       integer*2  GDA_DISABLE_TPS_POINT_DELETES */
+#define	GDA_DISABLE_TPS_POINT_DELETES	0x0002		
+/*       integer*2  GDA_DISABLE_TPS_POINT_DELETES_BIT */
+#define	GDA_DISABLE_TPS_POINT_DELETES_BIT	1	
+
+/*				    C - Use Local Time instead of UTC time for OPC date/time parameters */
+
+/*       integer*2  GDA_USELOCALTIME_OPC */
+#define	GDA_USELOCALTIME_OPC	0x0004		
+/*       integer*2  GDA_USELOCALTIME_OPC_BIT */
+#define	GDA_USELOCALTIME_OPC_BIT	2	
+
+/*				    D - Use X/Y instead of A/B for link suffixes. This is only relevant when the */
+/*                                       connection is redundant, ie. when GDA_REDUNDANTSVR is set. Currently used */
+/*                                       by some Point Servers. */
+
+/*       integer*2  GDA_LINK_SUFFIX_XY */
+#define	GDA_LINK_SUFFIX_XY	0x0008		
+
+/*                                   --------------------------------- */
+/*                               494 ! Refresh2Interval              ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_REFRESH2_INTERVAL */
+#define	GDA_REFRESH2_INTERVAL	494	
+
+/*                                   --------------------------------- */
+/*                               495 ! CurrentVersion                ! */
+/*                                   --------------------------------- */
+/*       integer*2  GDA_CURRENT_VERSION */
+#define	GDA_CURRENT_VERSION	495	
+/*                                   --------------------------------- */
+/*                           496-512 ! spare                         ! */
+/*                                   --------------------------------- */
+
+
+
+
+#define GDACONNECTION_PROGID_PREFIX "GdaRem"
+#define OPCCONNECTION_PROGID_PREFIX "Opc"
+
+struct gdatbl
+    {
+     int2  Name [GDANAMSZ/2];  /* connection name			      */
+     int2  DataOverloadState;  /* bit 15: in alarm, bits 0-14: overload cnt  */
+     int2  NotifOverloadState; /* bit 15: in alarm, bits 0-14: overload cnt  */
+     int2  Type [GDATYPSZ/2];  /* connection type			      */
+     int2  ServerName  [GDASNMSZ/2]; /* server name			      */
+     int2  ServerProgID[GDASIDSZ/2]; /* server progid			      */
+     int2  ConnectTime;        /* connect timeout			      */
+     int2  ReadTime;           /* read timeout				      */
+     int4  CacheFlushTime;     /* ms		                              */
+     int4  CacheAgeTime;       /* ms		                              */
+     int4  CacheValidTime;     /* ms		                              */
+     int4  ReadValidTime;      /* ms		                              */
+     int2  ListFragmentSize;   /* list fragment size			      */
+     int2  LinkSuffix[GDALNNUM][GDALNSSZ/2]; /* linksuffix = A/B and/or 0/1 eg A0,B1 etc  */
+     int2  LinkState[GDALNNUM]; /* state of link, FAILED, GOOD etc           */
+     int2  ReleaseNo[GDALNNUM/2]; /* release_no for remote servers,NB link (0&1) and (2&3) are same machines */
+     int2  AdjustmentNo[GDALNNUM/2]; /* adjustment_no for remote servers,NB see ReleaseNo*/
+     int2  ClientFlags; 	/* flags indicating client status              */
+     int2  ServerFlags; 	/* flags indicating server status. Bits 0,1,2,3,14,15 are config */ 
+     int2  TimeZone;           /* timezone offset in minutes from GMT        */
+     uint4 ParamCount;         /* number of parameter updates                */
+     float ParamCountAvg;      /* number of parameter updates                */
+     uint2 NotifBufferInterval;     /* (ms) Update buffer interval from remote alarm server     */
+     uint2 NotifKeepAliveInterval;  /* (ms) Keep alive interval from remote alarm server	      */
+     int2  NotifStatus;        /* Remote alarm server connection status      */
+     int2  NotifAreaSubCount;	/* Remote alarm server area subscribed count  */
+     uint4 NotifCount;		/* Count of notifications recv from remote alarm server	      */
+     float NotifCountAvg;	/* Average of notifications recv from remote alarm server	      */
+     int4  CurrentlySubscribed; /* number of parameters currently subscribed    */
+     int2  LinkStateSummary;    /* summary of link state, good,marginal (some good some bad) or fail */
+     int2  ServerArchitecture;  /* single/redundant server, single/dual lan */
+     int2  CpuSts[GDALNNUM/2]; /* CpuSts of remote server*/
+     int2  Abbreviation [(GDAABBSZ+1)/2];  /* connection abbreviation	      */
+     int2  DataReconnectDate;	/* Julian Days */
+     float DataReconnectTime;	/* Seconds since midnight */
+     int2  DataReconnectCount;	/* Number of times gdamngr has had to reconnect to this server */
+     int2  NotifReconnectDate;	/* Julian Days */
+     float NotifReconnectTime;	/* Seconds since midnight */
+     int2  NotifReconnectCount;/* Number of times gdanotcli has had to reconnect to this server */
+     int2  StatResetDate;	/* Julian Days */
+     float StatResetTime;	/* Seconds since midnight */
+     float ParamMaxRate;	/* max param rate (per second) */
+     float NotifMaxRate;	/* max notif rate (per second) */
+     int2  DataClientCount;	/* number of clients serviced by this data server */
+     int2  NotifClientCount;	/* number of clients serviced by this notification server */
+     int2  SQLSyncStatus;	/* SQL cardholder syncronization status. THis may be run-time!!! */
+     int2  DataConStatus;	/* status of data connection.  */
+     int2  NotifConStatus;	/* status of notif connection */
+     int2  StatsReset;		/* indicates that the stats were reset - mslinkd to clear flag */
+     int2  NotifServerArchitecture;	/* single/redundant notif server, single/dual lan !!! ??? !!!*/
+     int2  PointServerPort;	/* UDP port PointServer is listening on */
+     float TimeSyncTime;	/* Time to call the TimeSync method*/
+     int2  PointServerType;	/* Point Server Type */
+     int2  NotifServerProgID[GDASIDSZ/2];  /* notif server progid */
+     int2  ConnErrorAction;	/* action to take after connect errors reach limit */
+     int2  ConnErrorLimit;	/* connect error limit */
+     int2  ConnErrorCount;	/* count of consecutive connect errors */
+     int2  ServerFlags2;	/* !!! NEED INVESTIGATION !!! more flags indicating server status */ 
+     int2  NotifServerName[GDASNMSZ/2];    /* notif server name */
+     int2  NotifConnectTime;	/* notif connect timeout */
+     int2  NotifListFragmentSize;  /* notif list fragment size */
+     int2  NotifLinkSuffix[GDALNNUM][GDALNSSZ/2];  /* notif linksuffix = A/B and/or 0/1 eg A0,B1 etc */
+     int2  NotifLinkState[GDALNNUM];	/* state of link, FAILED, GOOD etc */
+     int2  NotifClientFlags;	/* flags indicating notif client status */
+     int2  NotifTimeZone;	/* notif timezone offset in minutes from GMT */
+     int2  DataConnectAttempts;    /* Number of times gdamngr has tried to connect to this server */
+     int2  NotifConnectAttempts;   /* Number of times gdanotcli has tried to connect to this server */
+     int2  AreaMapOption;	/* the area browsing option for an OPC connection */
+     int4  TotalOneShotReads;  /* Total number of parameters read via ReadByName calls on the IGdaRemData interface */
+     int4  TotalOneShotWrites; /* Total number of parameters written via WriteElementAsList calls on the IGdaRemData interface */
+     int4  DataTransCount;     /* Total number of transactions (RPC method calls over IGdaRemData) between gdamngr and gdaserver */
+     int2  DefaultAreaMapIndex; /* The default area that an OPC area will map into */
+     int2  OPCNotifServerStatus; /* the OPC Notification server status */
+     int2  OPCDataServerStatus; /* the OPC Data server status */
+     int2  OPCNotificationsEnabled; /* whether the opc connection is active or not */
+     int2  OPCBrowseAreas;
+     int2  DataProgIdIndex;	/* the index used for the data progid combobox */
+     int2  NotifProgIdIndex;	/* the index used for the notif progid combobox */
+     int2  ServerFlags3;	/* even more flags indicating server status */ 
+     int2  ItemPrefix[GDA_ITEMSYNTAXSZ/2];	/* OPC Item Prefix */
+     int2  ItemSeparator[GDA_ITEMSYNTAXSZ/2];	/* OPC Item Separator */
+     int2  ItemSuffix[GDA_ITEMSYNTAXSZ/2];	/* OPC Item Suffix */
+     float DriftDeadband;	/* Connection Drift Deadband */
+     int2  PntDtlMapOption;			/* PointDetailDisplay map option */
+     int2  PntDtlMapValue[GDA_PRMMAPSZ/2];	/* PointDetailDisplay map value */
+     int2  GrpDtlMapOption;			/* GroupDetailDisplay map option */
+     int2  GrpDtlMapValue[GDA_PRMMAPSZ/2];	/* GroupDetailDisplay map value */
+     int2  AssocMapOption;			/* AssociatedDisplay map option */
+     int2  AssocMapValue[GDA_PRMMAPSZ/2];	/* AssociatedDisplay map value */
+     int2  InstructMapOption;			/* InstructionDisplay map option */
+     int2  InstructMapValue[GDA_PRMMAPSZ/2];	/* InstructionDisplay map value */
+     int2  MapFile[GDAMAPFILSZ/2];		/* OPC mapping configuration file name */
+     int2  OPCRedundantFlag;   /* flags to indicate if the opc server is redundant or not */
+     int2  PriOPCDataServerName  [GDASNMSZ/2]; /* Primary OPC data server name */
+     int2  PriOPCDataServerProgID[GDASIDSZ/2]; /* Primary OPC data server progid */
+     int2  SecOPCDataServerName  [GDASNMSZ/2]; /* Secondary OPC data server name */
+     int2  SecOPCDataServerProgID[GDASIDSZ/2]; /* Secondary OPC data server progid */
+     int2  PriOPCNotifServerName  [GDASNMSZ/2]; /* Primary OPC Notification server name */
+     int2  PriOPCNotifServerProgID[GDASIDSZ/2]; /* Primary OPC Notification server progid */
+     int2  SecOPCNotifServerName  [GDASNMSZ/2]; /* Secondary OPC Notification server name */
+     int2  SecOPCNotifServerProgID[GDASIDSZ/2]; /* Secondary OPC Notification server progid */
+     uint2 AreaAlmStatus[GDAAREAALMSZ];   /* GDA Area Alarm Status */
+     int2  PntUpdate_Time[REAL_SZ];        /* seconds since midnight */
+     HSCTIME PntChange_Time;          /* Last Time local point was added, deleted or had its area changed on this GDA connection */
+     HSCTIME AppliedPntChange_Time;   /* Last PntChange time that has had it's changes applied to the tag cache */
+     int2  PntUpdate_Date;            /* julien days since 1-1-1981 */
+     PNTNUM RawItemPntNum;            /* point number to store raw items under */
+     int4  LastDataError;             /* last error that occurred on this data connection */
+     int4  LastNotifError;            /* last error that occurred on this notif connection */
+     float DataDisconnectTime;	/* Seconds since midnight */
+     float NotifDisconnectTime;	/* Seconds since midnight */
+     int2  DataDisconnectDate;	/* Julian Days */
+     int2  NotifDisconnectDate;	/* Julian Days */
+     HSCTIME RemPntChange_Time;       /* Last Time remote point was added, deleted or had its area changed on this GDA connection */
+     HSCTIME AppliedRemPntChange_Time;  /* Last RemPntChange time that has had it's changes applied to the tag cache */
+     int2  ServerLinkName[GDALNKNMSZ/2]; /* server link name                */
+     int2  Spare472;                  /* spare word */
+     int2  MoreServerFlags;           /* flag word */ 
+     int2  DiscoveryFragmentSize;     /* point discovery list fragment size	      */
+     uint4 AssetSubCount;             /* Remote alarm server asset subscribed count  */
+     uint4 TagCount;                  /* Count of tags recv from remote alarm server       */
+     float TagCountAvg;               /* Average of tags recv from remote alarm server             */
+     float TagMaxRate;                /* Max rate of tag arrival            */
+     int2  SiteID;                    /* SQL DSA Site ID */
+     int2  LastIssuedSiteID;          /* Last SQL DSA Site ID that has been issued from the publisher to a subscriber. */
+     uint2 NotifPortNum;              /* TCP port DSA notification server is listening on */
+     uint2 DataPortNum;	        /* TCP port DSA data server is listening on */
+     uint4 TagErrorCount;            	/* Count of tag errors since last reconnect/resubscribe */
+     int4  SpareReserved;             /* Reserved for 850 */
+     int4  SourceDeletedReconnectTime;/* Only used when gda source is deleted and try to reconnect in ms */
+     int2  ServerFlags4;              /* even more flags indicating server status */ 
+     int2  Refresh2Interval;          /* In OPC Connection Health Check, call Refresh2 once in every Refresh2Interval times */
+     int2  CurrentVersion;            /* Current version of this GdaRem connection */
+     int2  Spare[513-496];            /* spare words */
+    };
+
+
+
+#endif	

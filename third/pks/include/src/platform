@@ -1,0 +1,134 @@
+#if	!defined( PLATFORM_FLAG )
+#define	PLATFORM_FLAG
+
+/*     PLATFORM - computer specific dependencies */
+
+
+/*     SCCS REVISION: */
+/*         @(#)platform,v	830.1 */
+
+
+/*     DESCRIPTION: */
+/*         Holds all the directory information of all the globally sharable */
+/*         arrays used in FORTRAN and C. Each record is indexed by the SN60 */
+/*         file number (not to be confused with the lfn). */
+
+
+/*------------------------------------------------------------------------------- */
+/*     Define BIG_ENDIAN or LITTLE_ENDIAN */
+/*------------------------------------------------------------------------------- */
+
+
+#if	defined(DPS6)
+#define	BIG_ENDIAN
+#elif	defined(INTERACTIVE)
+#define	LITTLE_ENDIAN
+#elif	defined(SCO)
+#define	LITTLE_ENDIAN
+#elif	defined(HP_UX)
+#define	BIG_ENDIAN
+#elif	defined(VMS)
+#define	LITTLE_ENDIAN
+#elif	defined(NT)
+#define	LITTLE_ENDIAN
+#else	
+/* $$$$$ environment not defined. (DPS6, VMS, HP_UX, SCO, INTERACTIVE) */
+#endif	
+
+
+/*------------------------------------------------------------------------------- */
+/*     Define binary value of real -0.0 */
+/*------------------------------------------------------------------------------- */
+
+
+/*       integer*4     MINUS_ZERO */
+#if	defined(DPS6)
+#define	MINUS_ZERO	0x01000000		
+#elif	defined(INTERACTIVE)
+#define	MINUS_ZERO	-2147483648	     /*  =Z'80000000' */
+#elif	defined(SCO)
+#define	MINUS_ZERO	-2147483648	     /*  =Z'80000000' */
+#elif	defined(HP_UX)
+#define	MINUS_ZERO	0x80000000		
+#elif	defined(VMS)
+#define	MINUS_ZERO	0x80000000		
+#elif	defined(NT)
+#define	MINUS_ZERO	0x80000000		
+#else	
+/* $$$$$ environment not defined. (DPS6, VMS, HP_UX, SCO, INTERACTIVE) */
+#endif	
+
+
+/*------------------------------------------------------------------------------- */
+/*     Define the size of a disc sector in bytes (the record size of DATA) */
+/*                This must never be changed for a given platform as changing */
+/*                means that you cannot read data from an old database. */
+/*            the maximum size of a disc record in bytes */
+/*            the maximum size of a disc control interval in bytes */
+/*            the overhead per record in bytes */
+/*            the overhead per control interval in bytes */
+/*------------------------------------------------------------------------------- */
+
+#if	defined(HP700)
+/*       integer*2     DISC_SSZ */
+#else	
+/*       integer*4     DISC_SSZ */
+#endif	
+/*       integer*4     DISC_MRSZ */
+/*       integer*4     DISC_MCSZ */
+/*       integer*4     DISC_ORSZ */
+/*       integer*4     DISC_OCSZ */
+#if	defined(DPS6)
+#define	DISC_SSZ	256	
+#define	DISC_MRSZ	16383	 /*  16k-1   for MOD400 4.1 and HVS2.0 */
+#define	DISC_MCSZ	32512	 /*  32k-256 for MOD400 4.1 and HVS2.0 */
+#define	DISC_ORSZ	4	
+#define	DISC_OCSZ	8	
+#elif	defined(NT)
+#define	DISC_SSZ	256	
+#define	DISC_MRSZ	0	 /*  n/a */
+#define	DISC_MCSZ	0	 /*  n/a */
+#define	DISC_ORSZ	0	 /*  n/a */
+#define	DISC_OCSZ	0	 /*  n/a */
+#elif	defined(UNIX)
+#define	DISC_SSZ	256	
+#define	DISC_MRSZ	0	 /*  n/a */
+#define	DISC_MCSZ	0	 /*  n/a */
+#define	DISC_ORSZ	0	 /*  n/a */
+#define	DISC_OCSZ	0	 /*  n/a */
+#elif	defined(VMS)
+#define	DISC_SSZ	512	
+#define	DISC_MRSZ	32253	 /*  for variable length relative file */
+#define	DISC_MCSZ	0	 /*  n/a */
+#define	DISC_ORSZ	4	 /*  */
+#define	DISC_OCSZ	0	 /*  n/a */
+#else	
+/* $$$$$ environment not defined. (DPS6, UNIX, OR VMS) */
+#endif	
+
+
+/*------------------------------------------------------------------------------- */
+/*     Define maximum path size */
+/*------------------------------------------------------------------------------- */
+
+
+/*       integer*2     MAX_PATH_NAME_LENGTH */
+/*       integer*2	    MAX_COMMAND_LENGTH */
+#if	defined(DPS6)
+#define	MAX_PATH_NAME_LENGTH	80	
+#elif	defined(INTERACTIVE)
+#define	MAX_PATH_NAME_LENGTH	256	
+#elif	defined(SCO)
+#define	MAX_PATH_NAME_LENGTH	256	
+#elif	defined(HP_UX)
+#define	MAX_PATH_NAME_LENGTH	256	
+#elif	defined(VMS)
+#define	MAX_PATH_NAME_LENGTH	256	
+#elif	defined(NT)
+#define	MAX_PATH_NAME_LENGTH	260	
+#else	
+/* $$$$$ environment not defined. (DPS6, VMS, HP_UX, SCO, INTERACTIVE) */
+#endif	
+#define	MAX_COMMAND_LENGTH	(2*MAX_PATH_NAME_LENGTH+50)	
+
+#endif	

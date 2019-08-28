@@ -1,0 +1,260 @@
+
+#if	!defined(PRODUCT_REL)
+
+/*     SYSTEM - System sizing definitions */
+
+
+/*     SCCS REVISION: */
+/*         @(#)system,v	830.2.1.1 */
+
+
+/*     DESCRIPTION: */
+/*         This file holds all global sizing information which */
+/*         differentiates this system from other systems of the same release. */
+/*         See also, HISTORY, which contains initial history sizing. */
+
+
+
+#undef NUM_POINTS
+
+
+/*       integer*4  PRODUCT_REL */
+/*       character  PRODUCT_NAME*60 */
+#define	PRODUCT_REL	0x00083000		
+
+/*       integer*4  PREVIOUS_REL */
+#define	PREVIOUS_REL	0x00082000		
+
+#if	defined(sm1200)
+#define	PRODUCT_NAME	"Enterprise Buildings Integrator - Release 200 "		
+#else	
+#define	PRODUCT_NAME	"Experion PKS - Release Atlas "		
+#endif	
+
+/*       integer*2  NUM_FILES, NUM_AREAS */
+/*       integer*2  NUM_LOGGERS, NUM_LOGS, NUM_ODRRPT */
+#define	NUM_FILES	400	          /*  number of SN60 files */
+#define	NUM_AREAS	1001	          /*  number of areas         (1-1023) */
+#define	NUM_LOGGERS	50	          /*  number of printers      (1-50) */
+#define	NUM_LOGS	999	          /*  number of reports       (1-999) */
+#define	NUM_ODRRPT	100	          /*  number of ODR report types(1-100) */
+
+/*     Total number of crts (station windows) is the sum of all local, direct and config crts */
+/*       integer*2  NUM_CRTS, NUM_STATION, NUM_DIRECT_STATION, NUM_CONFIG_STATION, BASE_CONFIG_STATION */
+#define	NUM_STATION	40	           /*  number of stations */
+#define	NUM_DIRECT_STATION	40	    /*  number of direct stations */
+#define	NUM_CONFIG_STATION	4	     /*  number of configuration stations */
+#define	NUM_CRTS	(NUM_STATION+NUM_DIRECT_STATION+NUM_CONFIG_STATION+1)	
+#define	BASE_CONFIG_STATION	NUM_STATION + NUM_DIRECT_STATION + 1		/*  The starting Config CRT number */
+
+/*       integer*2  NUM_ALGBLK, SYS_BKRS, SIZ_BKRS, NUM_DFDS, SYS_SHAS */
+/*       integer*2  SIZ_SHAS, NUM_ACRNYM, NUM_CHNS, NUM_RTUS, NUM_LSTS, NUM_ACSPNTS */
+/*       integer*2  NUM_DUPS, NUM_SCPENGINES */
+/*       integer*4  NUM_POINTS */
+#define	NUM_ALGBLK	6000	          /*  number of algorithm blks (1-32k) */
+#define	SYS_BKRS	300	          /*  number of system backgrounds */
+#define	SIZ_BKRS	2000	          /*  size of backgrounds */
+#define	NUM_DFDS	4502	          /*  number of dfds per station */
+#define	SYS_SHAS	200	          /*  number of system shapes */
+#define	SIZ_SHAS	500	          /*  size of shapes */
+#define	NUM_ACRNYM	1000	          /*  number of acronyms       (1- 6k) */
+#define	NUM_CHNS	99	          /*  number of scan channels  (1- 99) */
+#define	NUM_DUPS	99	          /*  number of dialup channels(1-56k) */
+#define	NUM_RTUS	255	          /*  number of scan devices   (1-255) */
+#define	NUM_POINTS	65000	          /*  number of points         (1-64k) */
+#define	NUM_LSTS	2000	          /*  number of scan lists     (1-32k) */
+#define	NUM_SCPENGINES	40	          /*  number of script engines */
+
+/*       integer*2  NUM_VCSS, NUM_VCTS, NUM_SDLS, NUM_GGLS */
+/*       integer*2  NUM_MSGS, NUM_ALARMS */
+/*       integer*2  TASNM, GRPNM, NUM_SHIFTS */
+/*       integer*2  NUM_GRPCTRL, NUM_ALMMSG, NUM_ALMRSP */
+#define	NUM_VCSS	0	          /*  number of voice steps   (0-1000) */
+#define	NUM_VCTS	0	          /*  number of voice tenants (0-1000) */
+#define	NUM_SDLS	1002	          /*  number of schedules     (0-1002) */
+#define	NUM_GGLS	2000	          /*  number of point lists   (0- 32k) */
+#define	NUM_MSGS	1002	          /*  number of messages kept (0-1002) */
+#define	NUM_ALARMS	4002	          /*  number of alarms kept   (0-4002) */
+#define	TASNM	3000	          /*  number of trends        (1- 32k) */
+#define	GRPNM	16000	          /*  number of groups        (1- 32k) */
+#define	NUM_SHIFTS	300	          /*  number of shifts        (300) */
+#define	NUM_GRPCTRL	600	          /*  number of group controls(1-32k) */
+#define	NUM_ALMMSG	4000	          /*  number of alarm messages(1-32k) */
+#define	NUM_ALMRSP	1000	          /*  number of alarm response(1-32k) */
+
+/*       integer*2  SIZ_UTBL00 */
+#define	SIZ_UTBL00	256	          /*  size of UTBL00 (in kw)  (0-1000) */
+/*					     ;* (memory resident user file) */
+
+/*	Access options */
+
+/*       integer*2  NUM_LACS, NUM_LSCH */
+/*       integer*2  NUM_TPD, NUM_ZON, NUM_LVL, NUM_RPT, NUM_AGR */
+/*       integer*4  NUM_CRD */
+/*       integer*2  NUM_GRP, NUM_UKEY, NUM_ASP2 */
+/*       integer*2  NUM_EVTACTSEQ, NUM_AMP */
+#if	defined(sm1200)
+#define	NUM_ACSPNTS	4000	          /*  number of access points  (1-32k) */
+#define	NUM_LACS	16	          /*  number of LAC's         (0- 16) */
+#define	NUM_LSCH	500	          /*  number of LAC schecdules(0-500) */
+#define	NUM_TPD	256	          /*  number of Time periods  (1-256) */
+#define	NUM_ZON	2000	          /*  number of access zones  (1-2000) */
+#define	NUM_LVL	1024	          /*  number of access levels (1-1024) */
+#define	NUM_RPT	256	          /*  number of SE Rpt Modes  (1-256) */
+#define	NUM_AGR	256	          /*  number of Alarm Groups  (1-256) */
+#define	NUM_CRD	256000	         /*  number of Cards         (1-256k) */
+#define	NUM_GRP	1	          /*  number of Access Lvl Grp(1-1) */
+#define	NUM_UKEY	32	          /*  number of User Keys/Name records */
+#define	NUM_ASP2	2	          /*  number of Access Spare 2(1-1024) */
+#define	NUM_EVTACTSEQ	1024	       /*  number of SE event action sequences (1-1024) */
+#define	NUM_AMP	1024	          /*  number of SE Asset Movement Permissions(1-1024) */
+#else	
+#define	NUM_ACSPNTS	0	          /*  number of access points  (1-32k) */
+#define	NUM_LACS	0	          /*  number of LAC's         (0- 16) */
+#define	NUM_LSCH	0	          /*  number of LAC schecdules(0-500) */
+#define	NUM_TPD	1	          /*  number of Time periods  (1-256) */
+#define	NUM_ZON	1	          /*  number of access zones  (1-1024) */
+#define	NUM_LVL	1	          /*  number of access levels (1-1024) */
+#define	NUM_RPT	1	          /*  number of SE Rpt Modes  (1-256) */
+#define	NUM_AGR	1	          /*  number of Alarm Groups  (1-256) */
+#define	NUM_CRD	1	          /*  number of Cards         (1-256k) */
+#define	NUM_GRP	1	          /*  number of Access Lvl Grp(1-1) */
+#define	NUM_UKEY	0	          /*  number of User Keys     (1-1024) */
+#define	NUM_ASP2	1	          /*  number of Access Spare 2(1-1024) */
+#define	NUM_EVTACTSEQ	0	          /*  number of SE event action sequences (0) */
+#define	NUM_AMP	0	          /*  number of SE Asset Movement Permissions(0) */
+#endif	
+
+/*	EBI options */
+
+/*       integer*2  NUM_LIGHTS, NUM_PNTSTS, NUM_QACGRP */
+
+#if	defined(sm1200)
+#define	NUM_LIGHTS	1024		     /*  number of light zones   (1024) */
+#define	NUM_PNTSTS	50	          /*  number of Point status summary */
+/*                                            ;*           collections   (1- 50) */
+#define	NUM_QACGRP	2000	          /*  number of quick access groups (2000) */
+#else	
+#define	NUM_LIGHTS	0	
+#define	NUM_PNTSTS	0	
+#define	NUM_QACGRP	0	
+#endif	
+
+/*	Setpoint recipes (S9000 and UMAX) */
+
+/*       integer*2     NUM_SPPREC, NUM_UMAXSP */
+#define	NUM_SPPREC	150	
+#define	NUM_UMAXSP	1110	
+
+/*	Alarm pager */
+
+/*       integer*2 NUM_ALPALM, NUM_ALPCFG, NUM_ALPQUE, NUM_ALPESQ, NUM_ALPEML, NUM_ALPALT */
+#define	NUM_ALPALM	2000	
+#define	NUM_ALPCFG	120	
+#define	NUM_ALPQUE	100	
+#define	NUM_ALPESQ	100	
+#define	NUM_ALPEML	210	
+#if	defined(sm1200)
+#define	NUM_ALPALT	0	
+#else	
+#define	NUM_ALPALT	5000	
+#endif	
+
+
+/*    File Replication */
+
+/*       integer*2 NUM_FILREP */
+#define	NUM_FILREP	40	
+
+/*    Electronic Signature Reasons */
+
+/*       integer*2 NUM_SIGREASONS */
+#define	NUM_SIGREASONS	100	
+
+/*	XL10 Direct Access */
+
+/*       integer*2 NUM_XL10ZM, NUM_XL10XL, NUM_XL10SL */
+#define	NUM_XL10ZM	100	
+#define	NUM_XL10XL	32640	
+#define	NUM_XL10SL	2040	
+
+/*	Timers */
+
+/*       integer*2  TIME_UPDATE, TIME_SELECT, TIME_FREEZE, TIME_RQUEST */
+/*       integer*2  TIME_AUDALM, TIME_REALRM, TIME_IDLE */
+#define	TIME_UPDATE	1	          /*  update time */
+#define	TIME_SELECT	60	          /*  select timeout time */
+#define	TIME_FREEZE	3600	          /*  freeze timeout time */
+#define	TIME_RQUEST	15	          /*  invalid request timeout time */
+#define	TIME_AUDALM	10	          /*  audible alarm timeout time */
+#define	TIME_REALRM	60	          /*  re-alarm time */
+#define	TIME_IDLE	600	          /*  crt idle time */
+
+/*	Semaphores */
+
+/*       integer*2  UNAVAIL_SEM , PNTBLD_SEM */
+#define	UNAVAIL_SEM	0x0501		      /*  semaphore unavailable */
+#define	PNTBLD_SEM	0x4442	         /*  point builder database */
+
+
+/*	Scanning subsystem sizes */
+
+/*       integer*2  NUM_PADS */
+#define	NUM_PADS	NUM_RTUS	      /*  number of LCN PAD records */
+/*       integer*2  SIZ_ADDRESS, SIZ_IMAGE, WRD_IMAGE, SIZ_LIST, SIZ_CONFIG */
+#define	SIZ_ADDRESS	32766	         /*  size of RTU address space. */
+/*                                               Is maximum of device types to */
+/*                                               be configured in system. */
+/*                                               (max 32766) */
+#define	SIZ_IMAGE	6500	          /*  number of addresses that can be */
+/*                                               referenced in a RTU. */
+/*                                               Is maximum of device types to */
+/*                                               be configured in system. */
+/*                                               (max 6500) */
+#define	WRD_IMAGE	2	          /*  number of words per image entry. */
+#define	SIZ_LIST	100	          /*  size of address list. */
+#define	SIZ_CONFIG	16384	          /*  size of configuration. */
+
+
+/*                   address        image     image  address  config */
+/*     device        space          size (#1) words  list     size */
+
+/*     TDC           2048            500        1     100     5120 */
+/*     HYDRIL         256             64        1       -        - */
+/*     GE6          10240 (#2)      5000        1       -        - */
+/*     R1200         2048           2048        1       -        - */
+/*     PMX              ?              ?        2       -        - */
+/*     IPC           8192 (#2)      5000        1       -        - */
+/*     MODICON       8192 (#2)      5000        1       -        - */
+/*     LCN          32766           5000        2     300        - */
+/*     EXCEL          416            200        2       -        - */
+/*     ABR PLC      32766 (#2)      5000        1       -        - */
+/*     SMITH FC      2048              1        1       -        - */
+/*     LOGITROL      2048           1000        1       -        - */
+/*     SQUARE D      8192 (#2)      5000        1       -        - */
+/*     ASIC           128/asic (#4)   50/asic   1       -        - */
+/*     GEM 80        1024 (#2)       900        1       -        - */
+/*     720 PLC       2048 (#2)      1000        1       -        - */
+/*     HLAC           512            500        1       -        - */
+/*     TXI PLC       8192 (#2)      5000        1       -        - */
+/*     ADEMCO         100            100        1       -        - */
+/*     EXCEL +       6400            400        2     100        - */
+/*     EXCEL + CNI  32766           1500        2     100        - */
+/*     CMC300          32             64        2       -        - */
+/*     ASEA         32766           5000        2       -        - */
+/*     NIF          32766           5000        2     400        - */
+/*     BBABCOCK      6553           5000        2     100    12288 */
+/*     UDC            512           1024        2       -    12328 */
+
+/*         Notes: #1. these are typical sizes only. Oversizing tables */
+/*                    wastes disc space and increase disc requirements. */
+
+/*                #2. address space may be reduced if you do not wish to address */
+/*                    entire plc. Offset enables viewing of a small window. */
+
+/*                #3. there can be up to 64 terminals, starting with terminal 1. */
+
+/*                #4. there can be up to 32 asic's, starting with id=1 */
+
+#endif	
+

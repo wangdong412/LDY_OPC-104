@@ -1,0 +1,409 @@
+#if	!defined(DESSZ)
+
+/*                             DES000 - point DESCRIPTOR file */
+/*                             ------------------------------ */
+
+/*     SCCS REVISION: */
+/*         @(#)des000_def,v	830.1 */
+
+/*     NOTES: */
+/*	1) Reals and integer*4s must start on words 1,3,5 etc. */
+/*	2) Doubles must start on 1,5,9 etc. */
+/*	3) Sizes must be multiple of 4 to maintain 64 bit alignment. */
+
+
+/*       integer*2      DESSZ, DESSZ_STA, DESSZ_ANA, DESSZ_ACC */
+/*       integer*2             DESSZ_ACS, DESSZ_CDA, DESSZ_ASH */
+#define	DESSZ	128	
+#define	DESSZ_STA	128	
+#define	DESSZ_ANA	128	
+#define	DESSZ_ACC	128	
+#define	DESSZ_ACS	128	
+#define	DESSZ_CDA	128	
+#define	DESSZ_ASH	128	
+
+#if	!defined(USE_DERIVED_TYPE)
+/*       integer*2     DESBUF(DESSZ) */
+#endif	
+
+
+/*         STATUS point */
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                       31-34 !  state 0 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       35-38 !  state 1 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       39-42 !  state 2 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       43-46 !  state 3 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       47-50 !  state 4 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       51-54 !  state 5 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       55-58 !  state 6 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                       59-62 !  state 7 descriptor (8 chars) ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 name[20];   	/* point name			*/
+    uint2 unacount;           /* unacknowledge alarm count    */
+    uint2 asstnd;		/* associated trend  		*/
+    uint2 spare23;		/*				*/
+    uint2 almmsgidx;		/* alarm message index		*/
+    uint2 normal;		/* normal mode	     		*/
+    uint2 cntalmpri;		/* control alarm priority   	*/
+    uint2 staalmpri[4];	/* state  alarm priority   	*/
+    uint2 statedes[8][4];	/* state descriptors		*/
+    uint2 desc[66];   	/* point descriptor		*/
+    } STA_DES;
+
+
+/*       integer*2      PRNAM, PRDES, PRUNAC, ASSTND, ALMSG */
+/*       integer*2      OVWI , NORMMD, PRASUB, PRAPRI */
+/*       integer*2      GENPR, CNTPR, AL1PR, AL2PR, AL3PR, AL4PR */
+/*       integer*2      GENSB, CNTSB, AL1SB, AL2SB, AL3SB, AL4SB */
+/*       integer*2      AL5PR, AL6PR, AL7PR, AL8PR */
+/*       integer*2      AL5SB, AL6SB, AL7SB, AL8SB */
+/*       integer*2      PREU */
+/*       integer*2      PREU1, PREU2, PREU3, PREU4, PREU5, PREU6, PREU7 */
+/*       integer*2      PRLPC, PRHPC, PRUPC */
+#define	PRNAM	0x28C1		   /*      point name */
+#define	PRDES	0x84FF		   /*      point descriptor */
+#define	PRUNAC	0xF0D5		   /*      point unacknowledged alarm count */
+#define	ASSTND	0xF0D6		   /*      associated trend   */
+#define	ALMSG	0xF0D8		   /*      extended alarm message index */
+#define	OVWI	0x30D9		   /*  A - overview index (0-15) */
+#define	NORMMD	0x34D9		   /*  B - normal mode */
+#define	PRASUB	0x38D9		   /*  As- current alarm sunpriority  (0-15) */
+#define	PRAPRI	0x3CD9		   /*  Ap- current alarm priority     (0- 3) */
+#define	GENSB	0x30DA		   /*  Gs - general alarm subpriority (0-15) */
+#define	GENPR	0x34DA		   /*  Gp - general alarm priority    (0- 3) */
+#define	CNTSB	0x38DA		   /*  Cs - control alarm subpriority (0-15) */
+#define	CNTPR	0x3CDA		   /*  Cp - control alarm priority    (0- 3) */
+#define	AL1SB	0x30DB		   /*  AL1s - alarm1 subpriority (0-15) */
+#define	AL1PR	0x34DB		   /*  AL1p - alarm1 priority    (0- 3) */
+#define	AL2SB	0x38DB		   /*  AL2s - alarm2 subpriority (0-15) */
+#define	AL2PR	0x3CDB		   /*  AL2p - alarm2 priority    (0- 3) */
+#define	AL3SB	0x30DC		   /*  AL3s - alarm3 subpriority (0-15) */
+#define	AL3PR	0x34DC		   /*  AL3p - alarm3 priority    (0- 3) */
+#define	AL4SB	0x38DC		   /*  AL4s - alarm4 subpriority (0-15) */
+#define	AL4PR	0x3CDC		   /*  AL4p - alarm4 priority    (0- 3) */
+#define	AL5SB	0x30DD		   /*  AL1s - alarm1 subpriority (0-15) */
+#define	AL5PR	0x34DD		   /*  AL1p - alarm1 priority    (0- 3) */
+#define	AL6SB	0x38DD		   /*  AL2s - alarm2 subpriority (0-15) */
+#define	AL6PR	0x3CDD		   /*  AL2p - alarm2 priority    (0- 3) */
+#define	AL7SB	0x30DE		   /*  AL3s - alarm3 subpriority (0-15) */
+#define	AL7PR	0x34DE		   /*  AL3p - alarm3 priority    (0- 3) */
+#define	AL8SB	0x38DE		   /*  AL4s - alarm4 subpriority (0-15) */
+#define	AL8PR	0x3CDE		   /*  AL4p - alarm4 priority    (0- 3) */
+#define	PREU	0x08DF		   /*      point engineering units */
+#define	PREU1	0x08E3		   /*      state 1 descriptor */
+#define	PREU2	0x08E7		   /*      state 2 descriptor */
+#define	PREU3	0x08EB		   /*      state 3 descriptor */
+#define	PREU4	0x08EF		   /*      state 4 descriptor */
+#define	PREU5	0x08F3		   /*      state 5 descriptor */
+#define	PREU6	0x08F7		   /*      state 6 descriptor */
+#define	PREU7	0x08FB		   /*      state 7 descriptor */
+#define	PRLPC	0xF0DF		   /*      active low priority alarm count */
+#define	PRHPC	0xF0E0		   /*      active high priority alarm count */
+#define	PRUPC	0xF0E1		   /*      active urgent priority alarm count */
+
+
+
+/*         ANALOG point */
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                       31-34 !  PV eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       35-38 !  MD eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       39-42 !  OP eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       43-46 !  SP eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       47-50 !  A1 eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       51-54 !  A2 eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       55-58 !  A3 eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       59-62 !  A4 eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 name[20];		/* point name			*/
+    uint2 unacount;           /* unacknowledge alarm count    */
+    uint2 asstnd;		/* associated trend  		*/
+    uint2 spare23;		/*				*/
+    uint2 almmsgidx;		/* alarm message index		*/
+    uint2 normal;		/* normal mode	     		*/
+    uint2 cntalmpri;		/* control alarm priority   	*/
+    uint2 staalmpri[4];	/* state  alarm priority   	*/
+    uint2 eudes[8][4];	/* eu descriptors		*/
+    uint2 desc[66];		/* point descriptor		*/
+    } ANA_DES;
+
+
+
+
+/*         ACCUML point */
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                       31-34 !  PV eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       35-38 !  MD eu descriptor (8 chars)   ! */
+/*                             --------------------------------- */
+/*                       39-62 !        spare                  ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 name[20];		/* point name			*/
+    uint2 unacount;           /* unacknowledge alarm count    */
+    uint2 asstnd;		/* associated trend  		*/
+    uint2 spare23;		/*				*/
+    uint2 almmsgidx;		/* alarm message index		*/
+    uint2 normal;		/* normal mode	     		*/
+    uint2 cntalmpri;		/* control alarm priority   	*/
+    uint2 staalmpri[4];	/* state  alarm priority   	*/
+    uint2 eudes[2][4];	/* eu descriptors		*/
+    uint2 spare39[6][4];	/* eu descriptors		*/
+    uint2 desc[66];		/* point descriptor		*/
+    } ACC_DES;
+
+
+
+
+/*         ACCESS point */
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                       31-62 !        spare                  ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 name[20];		/* point name			*/
+    uint2 unacount;           /* unacknowledge alarm count    */
+    uint2 asstnd;		/* associated trend  		*/
+    uint2 spare23;		/*				*/
+    uint2 almmsgidx;		/* alarm message index		*/
+    uint2 normal;		/* normal mode	     		*/
+    uint2 cntalmpri;		/* control alarm priority   	*/
+    uint2 staalmpri[4];	/* state  alarm priority   	*/
+    uint2 spare31[8][4];	/* eu descriptors		*/
+    uint2 desc[66];		/* point descriptor		*/
+    } ACS_DES;
+
+
+
+
+/*         CDA point (and other GDA type points) */
+
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                          31 ! Count of active low alarms    ! */
+/*                             --------------------------------- */
+/*                          32 ! Count of active high alarms   ! */
+/*                             --------------------------------- */
+/*                          33 ! Count of active urgent alarms ! */
+/*                             --------------------------------- */
+/*                       34-62 !        spare                  ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+
+typedef struct
+    {
+    uint2 name[20];		/* point name			*/
+    uint2 unacount;           /* unacknowledge alarm count    */
+    uint2 asstnd;		/* associated trend  		*/
+    uint2 spare23;		/*				*/
+    uint2 almmsgidx;		/* alarm message index		*/
+    uint2 normal;		/* normal mode	     		*/
+    uint2 cntalmpri;		/* control alarm priority   	*/
+    uint2 staalmpri[4];	/* state  alarm priority   	*/
+    uint2 almcount[3];        /* counts of low, high & urgent */
+    uint2 spare34[29];        /* spare                        */
+    uint2 desc[66];		/* point descriptor		*/
+    } CDA_DES;
+
+
+
+
+/*         ASH point (and other hierarchy points) */
+
+/*                              5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                             --------------------------------- */
+/*                        1-20 !  point name       (40 chars)  ! */
+/*                             --------------------------------- */
+/*                          21 !  unack alarm count            ! */
+/*                             --------------------------------- */
+/*                          22 !  associated trend             ! */
+/*                             --------------------------------- */
+/*                          23 !  spare                        ! */
+/*                             --------------------------------- */
+/*                          24 !  extended alarm message index ! */
+/*                             --------------------------------- */
+/*                          25 !   Ap  !   As  !   B   !   A   ! */
+/*                             --------------------------------- */
+/*                          26 !   Cp  !   Cs  !   Gp  !   Gs  ! */
+/*                             --------------------------------- */
+/*                          27 ! AL2p  ! AL2s  ! AL1p  ! AL1s  ! */
+/*                             --------------------------------- */
+/*                          28 ! AL4p  ! AL4s  ! AL3p  ! AL3s  ! */
+/*                             --------------------------------- */
+/*                          29 ! AL6p  ! AL6s  ! AL5p  ! AL5s  ! */
+/*                             --------------------------------- */
+/*                          30 ! AL8p  ! AL8s  ! AL7p  ! AL7s  ! */
+/*                             --------------------------------- */
+/*                       31-62 !        spare                  ! */
+/*                             --------------------------------- */
+/*                      63-128 !  point descriptor (132 chars) ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 name[20];		    /* point name		    		    */
+    uint2 unacount;		    /* unacknowledge alarm count		    */
+    uint2 asstnd;		    /* associated display			    */
+    uint2 spare23;		    /*						    */
+    uint2 almmsgidx;		    /* alarm message index			    */
+    uint2 normal;		    /* normal mode	     			    */
+    uint2 cntalmpri;		    /* control alarm priority   		    */
+    uint2 staalmpri[4];	    /* state  alarm priority   			    */
+    uint2 spare31[32];	    /* spare					    */
+    uint2 desc[66];		    /* point descriptor				    */
+    } ASH_DES;
+
+
+#endif	

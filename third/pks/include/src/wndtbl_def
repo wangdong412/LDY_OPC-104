@@ -1,0 +1,101 @@
+#if	!defined( WNDTBLSZ )
+
+/*                             WNDTBL - crt window control table */
+/*                             --------------------------------- */
+
+/*     REVISION: */
+/*         @(#)wndtbl_def,v	830.1.1.2 */
+
+/*     DESCRIPTION: */
+/*         The structure of the crt window table is declared in this file. */
+/*         This table is indexed by the crt and window number. */
+
+
+/*       integer*2  WNDTBLSZ */
+#define	WNDTBLSZ	640			/*  size of a WNDTBL record */
+
+/*       integer*2  NUM_WNDS */
+#define	NUM_WNDS	32	 	/*  number of windows */
+
+/*	Object Ids have the window number in the upper bits */
+/*	NUM_WNDS must be less than the max implied by the mask */
+
+/*       integer*2  OBJ_NUM_MASK */
+/*       integer*2  OBJ_WND_MASK */
+/*       integer*2  OBJ_WND_BIT */
+#define	OBJ_NUM_MASK	0x07ff		 /*  object number field mask */
+#define	OBJ_WND_MASK	0x001f		 /*  object window field mask */
+#define	OBJ_WND_BIT	11 	 /*  object window field bit */
+
+
+/*     PARAMETER DEFINITIONS: */
+/*	For parameters defined in structure. */
+
+/*					;*  26 page up/down actions */
+/* 	integer*2  PAGACT_PAGE, PAGACT_NONE, PAGACT_REC, PAGACT_FLD, PAGACT_ORD */
+#define	PAGACT_PAGE	0		/*      Callup page in PAGUP/PAGDN */
+#define	PAGACT_NONE	1		/*      No action */
+#define	PAGACT_REC	2		/*      +/- rec offset by PAGUP/PAGDN */
+#define	PAGACT_FLD	3		/*      +/- field offset by PAGUP/PAGDN */
+#define	PAGACT_ORD	4		/*      +/- record change in detail order */
+
+#define	CRTSHVRSN_WRD	21  /*  */
+#define	CRTSHVTP_WRD	22  /*  */
+
+/*     STRUCTURE: */
+
+	struct t_WNDTBL {
+		/* sequence */
+		int2   flags1;		/*    1 crt window flags (see crttl_def) */
+		int2   flags2;		/*    2 crt window flags 2 (see crttl_def) */
+		int2   flags3;		/*    3 crt window flags 3 */
+		int2   crtind;		/*    4 indicators (see crttbl_def) */
+		int2   crtftr;		/*    5 freeze timer */
+		int2   prvtim;		/*    6 previous display timer */
+		int2   prvrst;		/*    7 previous display timer reset */
+		int2   tmpstorage[3];	/*    8,9,10 reserved temp storage locations for general use per window */
+		int2   crtasfn;		/*   11 functions redirected to associated windows */
+					/*      (see crtasfn in crttbl_def) */
+		int2   crtas1;		/*   12 associated window 1 */
+		int2   crtas2;		/*   13 associated window 2 */
+		int2   crtas3;		/*   14 associated window 3 */
+		int2   curupd;		/*   15 current update period of window */
+		int2   nrmupd;		/*   16 normal update period of window */
+		int2   fstupd;		/*   17 fast update period for window */
+		int2   crtnid;		/*   18 next object id */
+		int2   crtscl;		/*   19 scroll number (-ve=left) */
+		int2   crtcmd;		/*   20 Command number (CMDTBL) */
+		int2   crtshvrsn;		/*   21 alarm shelving reason (shelving dialog) */
+		int2   crtshvtp;		/*   22 alarm shelving time period (shelving dialog) */
+		int2   spare23[25-23];	/*   23 */
+		int2   tndvalpnt[8];	/*   25 trend value points */
+		int2   tndvalprm[8];	/*   33 trend value parameters */
+		int2   tndvaldat[8];	/*   41 trend value dates */
+		float  tndvaltim[8];	/*   49 trend value times */
+		float  tndvalval[8];	/*   65 trend value values */
+		int2   spare81[111-81];	/*   81 */
+		int2   dfdcnt;		/*  111 DFD count */
+		int2   dspset;		/*  112 display set (crc16 of set name) */
+		int2   attempt;		/*  113 display callup attempt */
+		int2   dspnum;		/*  114 display number */
+		int2   dsptyp;		/*  115 display type */
+		int2   dspare;		/*  116 display area */
+		int2   dspupd;		/*  117 display update rate */
+		int2   pagup;		/*  118 page up (backward) */
+		int2   pagdn;		/*  119 page down (foward) */
+		int2   pagact;		/*  120 page up/down action */
+					/*      A - Page up   actions (bits 0-3) */
+					/*      B - Page down actions (bits 4-7) */
+		int4   filoff;		/*  121 current file offset */
+		int4   recoff;		/*  123 current record offset */
+		int4   fldoff;		/*  125 current field offset */
+		int4   spare127;		/*  127 current field offset */
+		int2   dspnam[512];		/*  129 current display name */
+	};			/*  641 */
+
+#if	defined(COMMON_EXISTS)
+/*       type (t_WNDTBL) GBwndtbl(0:NUM_WNDS-1,NUM_CRTS) */
+/*       equivalence (WNDTBL , GBwndtbl) */
+#endif	
+
+#endif	

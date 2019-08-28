@@ -1,0 +1,520 @@
+#if	!defined(EXTSZ)
+
+/*                             EXT000 - point EXTENSION file */
+/*                             ----------------------------- */
+
+/*     SCCS REVISION: */
+/*         @(#)ext000_def,v	830.1 */
+
+/*     NOTES: */
+/*	1) Reals and integer*4s must start on words 1,3,5 etc. */
+/*	2) Doubles must start on 1,5,9 etc. */
+/*	3) Sizes must be multiple of 4 to maintain 64 bit alignment. */
+
+
+/*       integer*2      EXTSZ, EXTSZ_STA, EXTSZ_ANA, EXTSZ_ACC */
+/*       integer*2             EXTSZ_ACS, EXTSZ_CDA, EXTSZ_ASH */
+#define	EXTSZ	64	
+#define	EXTSZ_STA	4	
+#define	EXTSZ_ANA	48	
+#define	EXTSZ_ACC	32	
+#define	EXTSZ_ACS	64	
+#define	EXTSZ_CDA	4	
+#define	EXTSZ_ASH	4	
+
+#if	!defined(USE_DERIVED_TYPE)
+/*       integer*2     EXTBUF(EXTSZ) */
+#endif	
+
+
+/*         STATUS points */
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 !      filler                   ! */
+/*                            --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 filler;
+    } STA_EXT;
+
+
+
+/*         CDA point (and other GDA type points) */
+
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 !           EE code             ! */
+/*                            --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 eecode;		/*  EE code populated by alarms */
+    } CDA_EXT;
+
+
+
+
+
+/*         ASH point (and other hierarchy points) */
+
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 !           EE code             ! */
+/*                            --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 eecode;		/*  EE code populated by alarms */
+    } ASH_EXT;
+
+
+
+
+/*       integer*2      PVALGN, PVALGB, ACALGN, ACALGB, EECODE, AXTALG_LEN, AXTNODEL_OFF */
+#define	PVALGN	0x7041		 /*  PV algo number */
+#define	PVALGB	0xF042		 /*  PV algo block number */
+#define	ACALGN	0x7841		 /*  action algo number */
+#define	ACALGB	0xF043		 /*  action algo block number */
+#define	EECODE	0xF044		 /*  EE code number */
+#define	AXTALG_LEN	3	   /*  length of algo section */
+#define	AXTNODEL_OFF	4	 /*  Position from which not to delete */
+/*                                         when an access point is deleted. */
+
+
+
+/*         ANALOG point */
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 !               -               ! */
+/*                            --------------------------------- */
+/*                        5,8 !              op (%)           ! */
+/*                            --------------------------------- */
+/*                       9,12 !              sp (eu)          ! */
+/*                            --------------------------------- */
+/*                         13 !  AT4  !  AT3  !  AT2  !  AT1  ! */
+/*                            --------------------------------- */
+/*                         14 !  AT8  !  AT7  !  AT6  !  AT5  ! */
+/*                            --------------------------------- */
+/*                      15,16 !         alarm limit 1 (eu)    ! */
+/*                            --------------------------------- */
+/*                      17,18 !         alarm limit 2 (eu)    ! */
+/*                            --------------------------------- */
+/*                      19,20 !         alarm limit 3 (eu)    ! */
+/*                            --------------------------------- */
+/*                      21,22 !         alarm limit 4 (eu)    ! */
+/*                            --------------------------------- */
+/*                      23,24 !         alarm limit 5 (eu)    ! */
+/*                            --------------------------------- */
+/*                      25,26 !         alarm limit 6 (eu)    ! */
+/*                            --------------------------------- */
+/*                      27,28 !         alarm limit 7 (eu)    ! */
+/*                            --------------------------------- */
+/*                      29,30 !         alarm limit 8 (eu)    ! */
+/*                            --------------------------------- */
+/*                      31,32 !               -               ! */
+/*                            --------------------------------- */
+/*                      33,36 !  auxilary 1 value             ! */
+/*                            --------------------------------- */
+/*                      37,40 !  auxilary 2 value             ! */
+/*                            --------------------------------- */
+/*                      41,44 !  auxilary 3 value             ! */
+/*                            --------------------------------- */
+/*                      45,48 !  auxilary 4 value             ! */
+/*                             --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 spare3;		/*              		*/
+    double op;		/* op (%)			*/
+    double sp;		/* sp (eu)			*/
+    uint2 alarmtypes[2];	/* alarm types			*/
+    float limits[8];		/* alarm limits			*/
+    uint2 spare31[2];		/*              		*/
+    double a1;		/* A1 value			*/
+    double a2;		/* A2 value			*/
+    double a3;		/* A3 value			*/
+    double a4;		/* A4 value			*/
+    } ANA_EXT;
+
+
+/*       integer*2      OPP, SPP, A1P, A2P, A3P, A4P */
+/*       integer*2      AT1P, AT2P, AT3P, AT4P, AT5P, AT6P, AT7P, AT8P */
+/*       integer*2      AL1P, AL2P, AL3P, AL4P, AL5P, AL6P, AL7P, AL8P */
+#define	OPP	0x0045		    /*  output */
+#define	SPP	0x0049		    /*  setpoint */
+/*					;* see alarm state in DAT000 */
+#define	AT1P	0x304D		    /*  alarm type 1 */
+#define	AT2P	0x344D		    /*  alarm type 2 */
+#define	AT3P	0x384D		    /*  alarm type 3 */
+#define	AT4P	0x3C4D		    /*  alarm type 4 */
+#define	AT5P	0x304E		    /*  alarm type 5 */
+#define	AT6P	0x344E		    /*  alarm type 6 */
+#define	AT7P	0x384E		    /*  alarm type 7 */
+#define	AT8P	0x3C4E		    /*  alarm type 8 */
+#define	AL1P	0x004F		    /*  alarm limit 1 */
+#define	AL2P	0x0051		    /*  alarm limit 2 */
+#define	AL3P	0x0053		    /*  alarm limit 3 */
+#define	AL4P	0x0055		    /*  alarm limit 4 */
+#define	AL5P	0x0057		    /*  alarm limit 5 */
+#define	AL6P	0x0059		    /*  alarm limit 6 */
+#define	AL7P	0x005B		    /*  alarm limit 7 */
+#define	AL8P	0x005D		    /*  alarm limit 8 */
+#define	A1P	0x0061		    /*  auxilary value 1 */
+#define	A2P	0x0065		    /*  auxilary value 2 */
+#define	A3P	0x0069		    /*  auxilary value 3 */
+#define	A4P	0x006D		    /*  auxilary value 4 */
+
+#if	!defined(USE_DERIVED_TYPE)
+/*       double precision OPV, SPV, AXV(4) */
+/*       real          ALV(8) */
+/*       equivalence ( OPV  , $buf(OPP) ) */
+/*       equivalence ( SPV  , $buf(SPP) ) */
+/*       equivalence ( ALV  , $buf(AL1P) ) */
+/*       equivalence ( AXV  , $buf(A1P) ) */
+#endif	
+
+
+
+/*         ACCUML point */
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 !               -               ! */
+/*                            --------------------------------- */
+/*                        5,8 !         meter factor          ! */
+/*                            --------------------------------- */
+/*                       9,12 !         scale factor          ! */
+/*                            --------------------------------- */
+/*                         13 !  AT4  !  AT3  !  AT2  !  AT1  ! */
+/*                            --------------------------------- */
+/*                         14 !  AT8  !  AT7  !  AT6  !  AT5  ! */
+/*                            --------------------------------- */
+/*                      15,16 !         alarm limit 1 (eu)    ! */
+/*                            --------------------------------- */
+/*                      17,18 !         alarm limit 2 (eu)    ! */
+/*                            --------------------------------- */
+/*                      19,20 !         alarm limit 3 (eu)    ! */
+/*                            --------------------------------- */
+/*                      21,22 !         alarm limit 4 (eu)    ! */
+/*                            --------------------------------- */
+/*                      23,24 !         alarm limit 5 (eu)    ! */
+/*                            --------------------------------- */
+/*                      25,26 !         alarm limit 6 (eu)    ! */
+/*                            --------------------------------- */
+/*                      27,28 !         alarm limit 7 (eu)    ! */
+/*                            --------------------------------- */
+/*                      29,30 !         alarm limit 8 (eu)    ! */
+/*                            --------------------------------- */
+/*                      31,32 !               -               ! */
+/*                            --------------------------------- */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 spare3;		/*              		*/
+    double mf;		/* meter factor			*/
+    double sf;		/* scal factor			*/
+    uint2 alarmtypes[2];	/* alarm types			*/
+    float limits[8];		/* alarm limits			*/
+    uint2 spare31[2];		/*              		*/
+    } ACC_EXT;
+
+
+/*       integer*2      MFP, SFP */
+#define	MFP	0x0045		  /*  meter factor */
+#define	SFP	0x0049		  /*  scale factor */
+
+#if	!defined(USE_DERIVED_TYPE)
+/*       double precision MFV ,SFV */
+/*       equivalence ( MFV ,$buf(MFP) ) */
+/*       equivalence ( SFV ,$buf(SFP) ) */
+#endif	
+
+
+
+/*         ACCESS point */
+/*                             5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 */
+/*                            --------------------------------- */
+/*                          1 ! action algo # !   pv algo #   ! */
+/*                            --------------------------------- */
+/*                          2 !      pv algo block number     ! */
+/*                            --------------------------------- */
+/*                          3 !  action algo block number     ! */
+/*                            --------------------------------- */
+/*                          4 ! Card ID field A start position! */
+/*                            --------------------------------- */
+/*                          5 ! Card ID field A length        ! */
+/*                            --------------------------------- */
+/*                          6 ! Card ID field B start position! */
+/*                            --------------------------------- */
+/*                          7 ! Card ID field B length        ! */
+/*                            -------------------------------- */
+/*                          8 ! Card ID field C start position! */
+/*                            --------------------------------- */
+/*                          9 ! Card ID field C length        ! */
+/*                            --------------------------------- */
+/*                         10 ! Site Code start position      ! */
+/*                            --------------------------------- */
+/*                         11 ! Expiration date start pos'n   ! */
+/*                            --------------------------------- */
+/*                         12 ! ABA card data action number   ! */
+/*                            --------------------------------- */
+/*                         13 !               !H!G!F!E!D!C!B!A! */
+/*                            --------------------------------- */
+/*                            ! A  Failsoft: site code as key ! */
+/*                            ! B  Failsoft: deny on exp date ! */
+/*                            ! C  Failsoft: deny on site code! */
+/*                            ! D  Failsoft: deny on card ID  ! */
+/*                            ! E  Site code as key           ! */
+/*                            ! F  Deny on exp date           ! */
+/*                            ! G  Deny on site code          ! */
+/*                            ! H  Deny on card ID            ! */
+/*                            --------------------------------- */
+/*                         14 !               !S!             ! */
+/*                            --------------------------------- */
+/*                            ! S  Send card access once/read ! */
+/*                            --------------------------------- */
+/*                         15 ! Read range                    ! */
+/*                            --------------------------------- */
+/*                         16 ! # verification key reads      ! */
+/*                            --------------------------------- */
+/*                      17-18 ! Verification time window      ! */
+/*                            --------------------------------- */
+/*                      19-20 ! Beeper: on duration           ! */
+/*                            --------------------------------- */
+/*                      21-22 ! Beeper: off duration          ! */
+/*                            --------------------------------- */
+/*                      23-24 ! Beeper: on/off duration       ! */
+/*                            --------------------------------- */
+/*                      25-26 ! Red LED: on duration          ! */
+/*                            --------------------------------- */
+/*                      27-28 ! Red LED: off duration         ! */
+/*                            --------------------------------- */
+/*                      29-30 ! Red LED: on/off duration      ! */
+/*                            --------------------------------- */
+/*                      31-32 ! Green LED: on duration        ! */
+/*                            --------------------------------- */
+/*                      33-34 ! Green LED: off duration       ! */
+/*                            --------------------------------- */
+/*                      35-36 ! Green LED: on/off duration    ! */
+/*                            --------------------------------- */
+/*                         37 ! Reserved                      ! */
+/*                            --------------------------------- */
+/*                         38 !       ENTERZON rec number     ! */
+/*                            --------------------------------- */
+/*                         39 !        EXITZON rec number     ! */
+/*                            --------------------------------- */
+
+/*       integer*2      EZONE_ACS, XZONE_ACS */
+#define	EZONE_ACS	0xF066		  /*  Zone Enforcement entry zone */
+#define	XZONE_ACS	0xF067		  /*  Zone Enforcement exit zone */
+
+/* ABA Reader Configuration */
+
+/*       integer*2     AXTSPA, AXTLNA, AXTSPB, AXTLNB, AXTSPC, AXTLNC */
+/*       integer*2     AXTSCSP, AXTEDSP, AXTCDAN, AXTFLG */
+#define	AXTSPA	0xF044		    /*  Start position A */
+#define	AXTLNA	0xF045		    /*  Length A */
+#define	AXTSPB	0xF046		    /*  Start position B */
+#define	AXTLNB	0xF047		    /*  Length B */
+#define	AXTSPC	0xF048		    /*  Start position C */
+#define	AXTLNC	0xF049		    /*  Length C */
+#define	AXTSCSP	0xF04A		    /*  Site code start position */
+#define	AXTEDSP	0xF04B		    /*  expiry date start position */
+#define	AXTCDAN	0xF04C		    /*  ABA card data action number */
+#define	AXTFLG	0x704D		    /*  ABA reader flags */
+/*       integer*2	    AXTFLG_FSCK, AXTFLG_FDEX, AXTFLG_FDSC, AXTFLG_FDCRD */
+/*       integer*2	    AXTFLG_SCK, AXTFLG_DEX, AXTFLG_DSC, AXTFLG_DCRD */
+#define	AXTFLG_FSCK	0	    /*  ABA reader flag: Failsoft: site code as key */
+#define	AXTFLG_FDEX	1	    /*  ABA reader flag: Failsoft: deny on exp date */
+#define	AXTFLG_FDSC	2	    /*  ABA reader flag: Failsoft: deny on site code */
+#define	AXTFLG_FDCRD	3	    /*  ABA reader flag: Failsoft: deny on card ID */
+#define	AXTFLG_SCK	4	    /*  ABA reader flag: Site code as key */
+#define	AXTFLG_DEX	5	    /*  ABA reader flag: Deny on exp date */
+#define	AXTFLG_DSC	6	    /*  ABA reader flag: Deny on site code */
+#define	AXTFLG_DCRD	7	    /*  ABA reader flag: Deny on card ID */
+
+/*       integer*2     AXTSP_MAX, AXTLN_MAX, AXTCDAN_MAX */
+#define	AXTSP_MAX	40	      /*  Start position maximum */
+#define	AXTLN_MAX	8	       /*  Length maximum */
+#define	AXTCDAN_MAX	32	    /*  Card data action number maximum */
+
+
+/* Digikey Reader Data */
+
+/*       integer*2     AXTFDC, AXTRDR, AXTNVKR, AXTVTW */
+/*       integer*2     AXTBPON, AXTBPOF, AXTBPONF, AXTRLON, AXTRLOF, AXTRLONF */
+/*       integer*2     AXTGLON, AXTGLOF, AXTGLONF */
+#define	AXTFDC	0x074E		   /*  Forward digikey code */
+#define	AXTRDR	0xF04F		   /*  Read range */
+#define	AXTNVKR	0xF050		   /*  Number of verification key reads */
+#define	AXTVTW	0xF051		   /*  Verification time window */
+#define	AXTBPON	0xF053		   /*  Beeper on duration */
+#define	AXTBPOF	0xF055		   /*  Beeper off duration */
+#define	AXTBPONF	0xF057		   /*  Beeper on/off duration */
+#define	AXTRLON	0xF059		   /*  Red LED on duration */
+#define	AXTRLOF	0xF05B		   /*  Red LED off duration */
+#define	AXTRLONF	0xF05D		   /*  Red LED on/off duration */
+#define	AXTGLON	0xF05F		   /*  Green LED on duration */
+#define	AXTGLOF	0xF061		   /*  Green LED off duration */
+#define	AXTGLONF	0xF063		   /*  Green LED on/off duration */
+
+/*       integer*2     AXTRDR_MAX, AXTNVKR_MAX */
+/*       integer*4     AXTBEEP_MAX */
+#define	AXTRDR_MAX	255	    /*  Read range maximum */
+#define	AXTNVKR_MAX	255	    /*  Number of verification key reads maximum */
+#define	AXTBEEP_MAX	65535	  /*  Beeper maximum */
+
+
+/******* FS90 AMC Section ************* */
+
+/*                            --------------------------------- */
+/*                         40 ! global time period            ! */
+/*                            --------------------------------- */
+/*                         41 ! PIN pad ignore time period    ! */
+/*                            --------------------------------- */
+/*                         42 ! from area (0-255)             ! */
+/*                            --------------------------------- */
+/*                         43 ! to area (0-255)               ! */
+/*                            --------------------------------- */
+/*                         44 ! from level (0-6)	             ! */
+/*                            --------------------------------- */
+/*                         45 ! to level (0-6)                ! */
+/*                            --------------------------------- */
+/*                         46 ! shunt time (0-255)            ! */
+/*                            --------------------------------- */
+/*                         47 ! strike time (0-255)           ! */
+/*                            --------------------------------- */
+/*                         48 ! RTX sensor shunt time (0-255) ! */
+/*                            --------------------------------- */
+/*                         49 ! forgive shunt time (0-255)    ! */
+/*                            --------------------------------- */
+/*                         50 ! forgive shunt time period     ! */
+/*                            --------------------------------- */
+/*                         51 !             !H!G!F!E!D!C!B! A ! */
+/*                            --------------------------------- */
+/*                            !  A = controlled area type     ! */
+/*                            !      0 = normal               ! */
+/*                            !      1 = two man rule         ! */
+/*                            !      2 = supervisor required  ! */
+/*                            !  B = door passback reset      ! */
+/*                            !  C = reader lockout           ! */
+/*                            !  D = long access enable       ! */
+/*                            !  E = GC event initiator       ! */
+/*                            !  F = tracked reader           ! */
+/*                            !  G = reader not programmed    ! */
+/*                            !  H = in (0) / out (1) reader  ! */
+/*                            --------------------------------- */
+/*                         52 ! single door anti-passback time! */
+/*                            --------------------------------- */
+/*                      53-64 ! spare                         ! */
+/*                            --------------------------------- */
+
+/*       integer*2     AXTGTP, AXTPPITP, AXTFRA, AXTTOA */
+/*       integer*2	    AXTFRL, AXTTOL, AXTSHT, AXTSTT */
+/*       integer*2	    AXTRSST, AXTFST, AXTFSTP, AXTFSFLG, AXTSDPT */
+#define	AXTGTP	0xF068		  /*  global time period */
+#define	AXTPPITP	0xF069		  /*  PIN pad ignore time period */
+#define	AXTFRA	0xF06A		  /*  from area (0-255) */
+#define	AXTTOA	0xF06B		  /*  to area (0-255) */
+#define	AXTFRL	0xF06C		  /*  from level (0-6) */
+#define	AXTTOL	0xF06D		  /*  to level (0-6) */
+#define	AXTSHT	0xF06E		  /*  shunt time (0-255) */
+#define	AXTSTT	0xF06F		  /*  strike time (0-255) */
+#define	AXTRSST	0xF070		  /*  RTX sensor shunt time (0-255) */
+#define	AXTFST	0xF071		  /*  forgive shunt time (0-255) */
+#define	AXTFSTP	0xF072		  /*  forgive shunt time period */
+#define	AXTFSFLG	0x8073		  /*  FS90 AMC reader flags */
+#define	AXTSDPT	0xF074		  /*  single door anti-pback time (0-1440) */
+
+/*       integer*2	    AXTLVL_MAX, AXTTIM_MAX */
+#define	AXTLVL_MAX	6 	   /*  Max passback level */
+#define	AXTTIM_MAX	255 	 /*  Max time value */
+
+
+typedef struct
+    {
+    uint2 algos;		/* algo numbers			*/
+    uint2 pvalgblk;		/*   PV   algo block number	*/
+    uint2 actalgblk;		/* action algo block number	*/
+    uint2 axtspa;		/* Card ID start position A	*/
+    uint2 axtlna;		/* Card ID length A		*/
+    uint2 axtspb;		/* Card ID start position B	*/
+    uint2 axtlnb;		/* Card ID length B		*/
+    uint2 axtspc;		/* Card ID start position C	*/
+    uint2 axtlnc;		/* Card ID length C		*/
+    uint2 axtscsp;		/* Site code start position	*/
+    uint2 axtedsp;		/* Expiration date start position */
+    uint2 axtcdan;		/* ABA card data action number	*/
+    uint2 axtflg;		/* ABA reader flags		*/
+    uint2 axtfdc;		/* Forward digikey code		*/
+    uint2 axtrdr;		/* Read range			*/
+    uint2 axtnvkr;		/* Number of verification key reads */
+    long axtvtw;		/* Verification time window	*/
+    long axtbpon;		/* Beeper on duration		*/
+    long axtbpof;		/* Beeper off duration		*/
+    long axtbponf;		/* Beeper on/off duration	*/
+    long axtrlon;		/* Red LED on duration		*/
+    long axtrlof;		/* Red LED off duration		*/
+    long axtrlonf;		/* Red LED on/off duration	*/
+    long axtglon;		/* Green LED on duration	*/
+    long axtglof;		/* Green LED off duration	*/
+    long axtglonf;		/* Green LED on/off duration	*/
+    uint2 reserved;		/* reserved			*/
+    uint2 enterzone;		/* Zone enforcement enterzone	*/
+    uint2 exitzone;		/* Zone enforcement exitzone	*/
+    uint2 spare3[24];		/* spare space			*/
+    } ACS_EXT;
+
+
+
+#endif	
